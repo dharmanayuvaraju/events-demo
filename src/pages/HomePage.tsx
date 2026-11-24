@@ -6,7 +6,7 @@ import { DecorArtwork } from '../components/DecorArtwork';
 import { BUSINESS_CONFIG } from '../data/business';
 import { REEL_CHAPTERS } from '../data/chapters';
 import { ASSETS_MANIFEST } from '../data/assetsManifest';
-import { ArrowUpRight, CheckCircle2, MapPin, Star, Sparkles } from 'lucide-react';
+import { ArrowUpRight, CheckCircle2, MapPin, Star, Sparkles, Award } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -44,6 +44,16 @@ export const HomePage: React.FC = () => {
     };
   }, []);
 
+  // Curate 6 balanced portfolio items across all 4 themes for home showcase
+  const curatedHomeShowcase = [
+    ASSETS_MANIFEST.find((a) => a.id === 'decor-wed-grand-mandap') || ASSETS_MANIFEST[0],
+    ASSETS_MANIFEST.find((a) => a.id === 'decor-bday-safari-stage') || ASSETS_MANIFEST[1],
+    ASSETS_MANIFEST.find((a) => a.id === 'decor-balloon-entrance-arch') || ASSETS_MANIFEST[2],
+    ASSETS_MANIFEST.find((a) => a.id === 'decor-flower-temple-toran') || ASSETS_MANIFEST[3],
+    ASSETS_MANIFEST.find((a) => a.id === 'decor-bday-pastel-ring') || ASSETS_MANIFEST[4],
+    ASSETS_MANIFEST.find((a) => a.id === 'decor-flower-haldi-canopy') || ASSETS_MANIFEST[5],
+  ];
+
   return (
     <div ref={sectionsRef}>
       {/* 1. Reel Hero: Fast-Cut Celebration Reel System */}
@@ -57,9 +67,9 @@ export const HomePage: React.FC = () => {
         <div className="container">
           <div className="section-header max-w-3xl">
             <span className="section-label">Colors Events &amp; Entertainment</span>
-            <h2 className="section-title">
+            <h1 className="section-title">
               Make room for a little wonder.
-            </h2>
+            </h1>
             <p className="section-lead">
               Birthday, wedding, balloon and flower decorations in Kukatpally, Hyderabad. Designed with editorial clarity, balanced color palettes, and respect for your celebration venue.
             </p>
@@ -101,7 +111,7 @@ export const HomePage: React.FC = () => {
                     />
                   </div>
 
-                  <h3 className="service-card-title">{chap.name}</h3>
+                  <h2 className="service-card-title">{chap.name}</h2>
                   <p className="service-card-desc">{chap.scopeLine}</p>
                 </div>
 
@@ -121,7 +131,116 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Visual Gallery Plate Preview */}
+      {/* 4. Signature Showcase Spotlight: Authentic Venue Execution */}
+      <section className="section-paper" style={{ backgroundColor: '#F6EFE6', borderTop: '1px solid rgba(33, 29, 36, 0.08)', borderBottom: '1px solid rgba(33, 29, 36, 0.08)' }}>
+        <div className="container">
+          <div className="max-w-3xl mb-10">
+            <span className="section-label">Signature Staging Spotlight</span>
+            <h2 className="section-title">Authentic Venue Transformations in Hyderabad</h2>
+            <p className="section-lead">
+              From landmark 1st birthday milestone stages with custom 3D props to traditional floral ceremony mandaps, discover how we transform Kukatpally venues with precision craftsmanship.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Feature 1: Authentic Safari 1st Birthday Stage */}
+            <div className="bg-[#FFFDF9] rounded border border-neutral-300 overflow-hidden shadow-sm reveal-item flex flex-col justify-between">
+              <div>
+                <div className="relative aspect-[16/10] overflow-hidden bg-neutral-900">
+                  <img
+                    src="/portfolio/maps_photo_stage_2.jpg"
+                    alt="1st Birthday Safari Stage with 3D animal props in Kukatpally"
+                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div className="absolute top-3 left-3 bg-amber-600 text-white text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded shadow flex items-center gap-1.5">
+                    <MapPin size={12} />
+                    <span>Verified Kukatpally Setup</span>
+                  </div>
+                </div>
+                <div className="p-6 md:p-8">
+                  <div className="flex items-center gap-2 text-xs font-bold text-coral uppercase tracking-wider mb-2">
+                    <Sparkles size={14} />
+                    <span>Milestone Birthday Staging</span>
+                  </div>
+                  <h3 className="font-serif text-2xl font-bold mb-3">
+                    1st Birthday Jungle Safari Celebration Stage
+                  </h3>
+                  <p className="text-sm opacity-85 leading-relaxed mb-4">
+                    Complete experiential stage setup in Kukatpally featuring 3D life-sized animal props (Giraffe, Elephant, Zebra, Lion), illuminated marquee letters, multi-tier balloon framing, and ceiling fabric swags.
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {["3D Animal Props", "Marquee Lettering", "Organic Balloon Clusters", "Ceiling Canopy"].map((tag, i) => (
+                      <span key={i} className="text-xs bg-neutral-100 border border-neutral-200 px-2.5 py-1 rounded font-medium">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="px-6 md:px-8 pb-6 pt-4 border-t border-neutral-200 bg-neutral-50 flex items-center justify-between">
+                <span className="text-xs opacity-75">Banquet Hall &bull; Kukatpally</span>
+                <Link
+                  to="/contact?category=birthday&title=1st%20Birthday%20Safari%20Stage"
+                  className="btn-primary text-xs py-2 px-3"
+                >
+                  <span>Plan Safari Theme</span>
+                  <ArrowUpRight size={14} className="ml-1" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Feature 2: Grand Indian Wedding Mandap */}
+            <div className="bg-[#FFFDF9] rounded border border-neutral-300 overflow-hidden shadow-sm reveal-item flex flex-col justify-between">
+              <div>
+                <div className="relative aspect-[16/10] overflow-hidden bg-neutral-900">
+                  <img
+                    src="/portfolio/photo_wedding_mandap_grand.jpg"
+                    alt="Grand Indian Wedding Stage with traditional marigold floral mandap"
+                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div className="absolute top-3 left-3 bg-[#244AD3] text-white text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded shadow flex items-center gap-1.5">
+                    <Award size={12} />
+                    <span>Grand Ceremony Mandap</span>
+                  </div>
+                </div>
+                <div className="p-6 md:p-8">
+                  <div className="flex items-center gap-2 text-xs font-bold text-coral uppercase tracking-wider mb-2">
+                    <Sparkles size={14} />
+                    <span>Wedding &amp; Reception Decor</span>
+                  </div>
+                  <h3 className="font-serif text-2xl font-bold mb-3">
+                    Traditional Floral Mandap &amp; Royal Fabric Drapery
+                  </h3>
+                  <p className="text-sm opacity-85 leading-relaxed mb-4">
+                    Grand four-pillar ceremonial mandap adorned with fragrant golden marigold strings, fresh jasmine latkans, royal blue and gold silk drapery, and ceremonial brass urlis.
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {["Four-Pillar Mandap", "Fresh Marigold Strings", "Silk Fabric Drapery", "Brass Diya Staging"].map((tag, i) => (
+                      <span key={i} className="text-xs bg-neutral-100 border border-neutral-200 px-2.5 py-1 rounded font-medium">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="px-6 md:px-8 pb-6 pt-4 border-t border-neutral-200 bg-neutral-50 flex items-center justify-between">
+                <span className="text-xs opacity-75">Convention Hall &bull; Hyderabad</span>
+                <Link
+                  to="/contact?category=wedding&title=Grand%20Floral%20Mandap"
+                  className="btn-primary text-xs py-2 px-3"
+                >
+                  <span>Plan Wedding Mandap</span>
+                  <ArrowUpRight size={14} className="ml-1" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Visual Gallery Plate Preview */}
       <section className="section-paper" style={{ backgroundColor: '#FAF4EB' }}>
         <div className="container">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
@@ -129,17 +248,17 @@ export const HomePage: React.FC = () => {
               <span className="section-label">Real Celebrations &amp; Concepts</span>
               <h2 className="section-title">Decor Portfolio Showcase</h2>
               <p className="section-lead">
-                Authentic photographs from our Google Maps listing and curated celebration setups for Kukatpally venues.
+                Explore authentic venue photographs and curated celebration setups for Kukatpally events.
               </p>
             </div>
 
             <Link to="/gallery" className="btn-secondary self-start md:self-auto">
-              View All 8 Portfolio Works
+              View All 12 Portfolio Works
             </Link>
           </div>
 
           <div className="gallery-grid">
-            {ASSETS_MANIFEST.slice(0, 6).map((item) => (
+            {curatedHomeShowcase.map((item) => (
               <div key={item.id} className="gallery-card reveal-item">
                 <div className="gallery-thumb-wrap">
                   <DecorArtwork asset={item} variant="thumb" />
@@ -165,7 +284,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. Proposed Planning Process */}
+      {/* 6. Proposed Planning Process */}
       <section className="section-paper">
         <div className="container">
           <div className="section-header text-center max-w-2xl mx-auto">
@@ -210,7 +329,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 6. Locality & Contact Finish */}
+      {/* 7. Locality & Contact Finish */}
       <section className="section-paper" style={{ backgroundColor: '#FDFBF7' }}>
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
@@ -262,7 +381,7 @@ export const HomePage: React.FC = () => {
                 <h3 className="font-serif text-xl font-bold">Concept Preview Draft</h3>
               </div>
               <p className="text-sm opacity-85 leading-relaxed mb-4">
-                This digital presentation is an unapproved client demonstration for Colors Events &amp; Entertainment. Prior to commercial launch, real venue photographs will replace these vector placeholders and direct inquiry dispatch will be activated.
+                This digital presentation is an unapproved client demonstration for Colors Events &amp; Entertainment. Prior to commercial launch, custom photo rights and inquiry routing will be finalized.
               </p>
               <div className="text-xs opacity-65 leading-normal border-t border-neutral-200 pt-3">
                 No corporate events, catering, DJs, photography or destination packages are claimed without explicit client authorization.

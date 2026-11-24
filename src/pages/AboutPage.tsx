@@ -1,7 +1,7 @@
 import React from 'react';
 import { BUSINESS_CONFIG } from '../data/business';
 import { LAUNCH_CHECKLIST } from '../data/launchChecklist';
-import { Star, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Star, CheckCircle2, ShieldCheck, MapPin } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
   return (
@@ -18,10 +18,10 @@ export const AboutPage: React.FC = () => {
 
         {/* Core Principles Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          <div className="p-8 rounded border border-neutral-300 bg-[#FFFDF9]">
+          <div className="p-8 rounded border border-neutral-300 bg-[#FFFDF9] shadow-sm">
             <h2 className="font-serif text-2xl font-bold mb-4">Our Decoration Focus</h2>
             <p className="text-sm opacity-85 leading-relaxed mb-4">
-              Rather than attempting to coordinate full-scale catering, DJ entertainment, or photography packages, Colors Events focuses strictly on decor artistry.
+              Rather than attempting to coordinate full-scale catering, DJ entertainment, or photography packages, Colors Events focuses strictly on decor artistry and stage aesthetics.
             </p>
             <ul className="space-y-3 text-sm opacity-85">
               <li className="flex items-start gap-2.5">
@@ -39,7 +39,7 @@ export const AboutPage: React.FC = () => {
             </ul>
           </div>
 
-          <div className="p-8 rounded border border-neutral-300 bg-[#FFFDF9]">
+          <div className="p-8 rounded border border-neutral-300 bg-[#FFFDF9] shadow-sm">
             <h2 className="font-serif text-2xl font-bold mb-4">Hyper-Local Kukatpally Presence</h2>
             <p className="text-sm opacity-85 leading-relaxed mb-4">
               Positioned near the landmark Ramalayam Temple on HMT Road, Mahankali Nagar, our proximity enables swift venue walkthroughs and prompt setup across:
@@ -58,7 +58,7 @@ export const AboutPage: React.FC = () => {
         </div>
 
         {/* Verified Listing & Reputation */}
-        <div className="p-8 rounded border border-neutral-300 bg-[#FAF4EB] mb-16">
+        <div className="p-8 rounded border border-neutral-300 bg-[#FAF4EB] mb-16 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <span className="section-label">Verified Record</span>
@@ -90,7 +90,7 @@ export const AboutPage: React.FC = () => {
         </div>
 
         {/* Authentic Local Staging Photography */}
-        <div className="p-8 rounded border border-neutral-300 bg-[#FFFDF9] mb-16">
+        <div className="p-8 rounded border border-neutral-300 bg-[#FFFDF9] mb-16 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
             <div>
               <span className="section-label">Field Execution</span>
@@ -110,82 +110,71 @@ export const AboutPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="rounded overflow-hidden border border-neutral-200 bg-neutral-900 shadow-sm">
+            <div className="rounded overflow-hidden border border-neutral-300 bg-neutral-900 shadow-sm">
               <img
                 src="/portfolio/maps_photo_stage_2.jpg"
-                alt="Colors Events celebration stage and balloon decor in Kukatpally"
+                alt="1st Birthday Safari Stage with 3D animal props in Kukatpally"
                 className="w-full h-64 object-cover"
                 loading="lazy"
               />
-              <div className="p-4 bg-white">
-                <span className="text-[11px] font-bold uppercase text-amber-700 bg-amber-100 px-2 py-0.5 rounded inline-block mb-1">
-                  Google Maps Profile Photo
+              <div className="p-5 bg-white">
+                <span className="text-[11px] font-bold uppercase text-amber-800 bg-amber-100 px-2.5 py-1 rounded inline-flex items-center gap-1 mb-2">
+                  <MapPin size={11} />
+                  <span>Verified Kukatpally Setup</span>
                 </span>
-                <h3 className="font-serif font-bold text-base">Stage Balloon Frame &amp; Canopy Drapery</h3>
-                <p className="text-xs opacity-75 mt-1">Multi-colored organic balloon garland and pleated fabric backdrop setup.</p>
+                <h3 className="font-serif font-bold text-lg">1st Birthday Safari Jungle Stage</h3>
+                <p className="text-xs opacity-75 mt-1 leading-relaxed">
+                  Experiential milestone birthday stage featuring 3D animal props (Giraffe, Elephant, Zebra), illuminated marquee lettering, multi-tier balloon framing, and ceiling fabric drapery.
+                </p>
               </div>
             </div>
 
-            <div className="rounded overflow-hidden border border-neutral-200 bg-neutral-900 shadow-sm">
+            <div className="rounded overflow-hidden border border-neutral-300 bg-neutral-900 shadow-sm">
               <img
                 src="/portfolio/maps_photo_1.jpg"
                 alt="Colors Events celebration panorama setup"
                 className="w-full h-64 object-cover"
                 loading="lazy"
               />
-              <div className="p-4 bg-white">
-                <span className="text-[11px] font-bold uppercase text-amber-700 bg-amber-100 px-2 py-0.5 rounded inline-block mb-1">
-                  Google Maps Profile Photo
+              <div className="p-5 bg-white">
+                <span className="text-[11px] font-bold uppercase text-amber-800 bg-amber-100 px-2.5 py-1 rounded inline-flex items-center gap-1 mb-2">
+                  <MapPin size={11} />
+                  <span>Verified Kukatpally Setup</span>
                 </span>
-                <h3 className="font-serif font-bold text-base">Panoramic Celebration Dais</h3>
-                <p className="text-xs opacity-75 mt-1">Wide celebration stage framing with ceremonial props and accent lighting.</p>
+                <h3 className="font-serif font-bold text-lg">Panoramic Celebration Dais &amp; Backdrop</h3>
+                <p className="text-xs opacity-75 mt-1 leading-relaxed">
+                  Wide celebration stage framing with ceremonial drapery, coordinated arch styling, and warm ambient stage lighting.
+                </p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Client Launch Checklist & Blocker Table */}
-        <div className="p-8 rounded border border-neutral-300 bg-[#FFFDF9]">
+        <div className="p-8 rounded border border-neutral-300 bg-[#FFFDF9] shadow-sm">
           <div className="flex items-center gap-3 mb-4">
             <ShieldCheck size={24} className="text-coral" />
-            <h2 className="font-serif text-2xl font-bold">
-              Client Launch Checklist &amp; Operational Prerequisites
-            </h2>
+            <h2 className="font-serif text-2xl font-bold">Launch Readiness &amp; Governance</h2>
           </div>
-          <p className="text-sm opacity-75 mb-6">
-            This transparent tracker defines the exact requirements needed before this draft concept may be promoted to an indexed, public production release.
+          <p className="text-sm opacity-85 leading-relaxed mb-6">
+            This site is structured with rigorous honesty. Before public release, the following items require client sign-off:
           </p>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs md:text-sm border-collapse">
+            <table className="w-full text-left text-sm border-collapse">
               <thead>
                 <tr className="border-b border-neutral-300 bg-neutral-100">
-                  <th className="py-2.5 px-3 font-bold">ID</th>
-                  <th className="py-2.5 px-3 font-bold">Requirement</th>
-                  <th className="py-2.5 px-3 font-bold">Current Status</th>
-                  <th className="py-2.5 px-3 font-bold">Prerequisite Action</th>
+                  <th className="p-3 font-semibold">Requirement</th>
+                  <th className="p-3 font-semibold">Current State</th>
+                  <th className="p-3 font-semibold">Resolution Path</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-200">
                 {LAUNCH_CHECKLIST.map((item) => (
-                  <tr key={item.id} className="hover:bg-neutral-50">
-                    <td className="py-3 px-3 font-mono font-semibold">{item.id}</td>
-                    <td className="py-3 px-3">
-                      <strong>{item.title}</strong>
-                      <div className="text-xs opacity-70 mt-0.5">{item.description}</div>
-                    </td>
-                    <td className="py-3 px-3">
-                      <span
-                        className={`inline-flex items-center gap-1 font-bold text-xs uppercase px-2 py-0.5 rounded ${
-                          item.status === 'blocked'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
-                      >
-                        {item.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-3 opacity-80">{item.actionRequired}</td>
+                  <tr key={item.id}>
+                    <td className="p-3 font-medium">{item.title}</td>
+                    <td className="p-3 text-xs opacity-80">{item.status}</td>
+                    <td className="p-3 text-xs">{item.actionRequired}</td>
                   </tr>
                 ))}
               </tbody>

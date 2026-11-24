@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ASSETS_MANIFEST, PortfolioAsset } from '../data/assetsManifest';
 import { DecorArtwork } from '../components/DecorArtwork';
 import { Lightbox } from '../components/Lightbox';
-import { ArrowUpRight, Camera } from 'lucide-react';
+import { ArrowUpRight, Camera, Sparkles } from 'lucide-react';
 
 export const GalleryPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -55,6 +55,18 @@ export const GalleryPage: React.FC = () => {
   const currentAsset: PortfolioAsset | null =
     selectedAssetIndex !== null ? filteredAssets[selectedAssetIndex] || null : null;
 
+  // Compute category counts
+  const counts = useMemo(() => {
+    return {
+      all: ASSETS_MANIFEST.length,
+      maps: ASSETS_MANIFEST.filter((i) => i.status === 'verified_maps_photo').length,
+      birthday: ASSETS_MANIFEST.filter((i) => i.category === 'birthday').length,
+      wedding: ASSETS_MANIFEST.filter((i) => i.category === 'wedding').length,
+      balloons: ASSETS_MANIFEST.filter((i) => i.category === 'balloons').length,
+      flowers: ASSETS_MANIFEST.filter((i) => i.category === 'flowers').length,
+    };
+  }, []);
+
   return (
     <div className="section-paper">
       <div className="container">
@@ -63,19 +75,19 @@ export const GalleryPage: React.FC = () => {
           <span className="section-label">Portfolio &amp; Verified Works</span>
           <h1 className="section-title">Decor Portfolio &amp; Visual Plates</h1>
           <p className="section-lead">
-            Featuring authentic photos extracted from the Colors Events &amp; Entertainment Google Maps business listing in Kukatpally, paired with curated design specification plates.
+            Explore our curated celebration staging, combining authentic setup photography from our Kukatpally Google Maps listing with bespoke designs across birthday, wedding, balloon, and flower themes.
           </p>
         </div>
 
         {/* Category Filters */}
         <div className="gallery-filters" role="tablist" aria-label="Gallery Category Filters">
           {[
-            { id: 'all', label: 'All Portfolio (8)' },
-            { id: 'maps', label: 'Google Maps Photos (2)', isHighlight: true },
-            { id: 'birthday', label: 'Birthday (2)' },
-            { id: 'wedding', label: 'Wedding (3)' },
-            { id: 'balloons', label: 'Balloons (2)' },
-            { id: 'flowers', label: 'Flowers (1)' },
+            { id: 'all', label: `All Portfolio (${counts.all})` },
+            { id: 'maps', label: `Verified Local (${counts.maps})`, isHighlight: true },
+            { id: 'birthday', label: `Birthday (${counts.birthday})` },
+            { id: 'wedding', label: `Wedding (${counts.wedding})` },
+            { id: 'balloons', label: `Balloons (${counts.balloons})` },
+            { id: 'flowers', label: `Flowers (${counts.flowers})` },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -88,7 +100,11 @@ export const GalleryPage: React.FC = () => {
               onClick={() => handleFilterChange(tab.id)}
             >
               <span className="flex items-center gap-1.5">
-                {tab.isHighlight && <Camera size={14} className="text-amber-600" />}
+                {tab.isHighlight ? (
+                  <Camera size={14} className="text-amber-600" />
+                ) : (
+                  <Sparkles size={13} className="opacity-70" />
+                )}
                 <span>{tab.label}</span>
               </span>
             </button>
@@ -100,7 +116,7 @@ export const GalleryPage: React.FC = () => {
           {filteredAssets.map((asset, idx) => (
             <article
               key={asset.id}
-              className="gallery-card"
+              className="gallery-card group"
               onClick={() => openLightbox(idx)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -143,7 +159,7 @@ export const GalleryPage: React.FC = () => {
                 <h2 className="gallery-card-title">{asset.title}</h2>
                 <p className="gallery-card-meta">{asset.spec.recommendedVenue}</p>
 
-                <div className="mt-2 flex items-center justify-between text-xs font-bold text-coral">
+                <div className="mt-2 flex items-center justify-between text-xs font-bold text-coral group-hover:underline">
                   <span>View Full Details</span>
                   <ArrowUpRight size={14} />
                 </div>
