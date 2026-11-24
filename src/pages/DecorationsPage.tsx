@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ASSETS_MANIFEST } from '../data/assetsManifest';
+import { resolveThemeSectionId } from '../data/themeMapping';
 import { DecorArtwork } from '../components/DecorArtwork';
 import { ArrowUpRight, Sparkles, Check } from 'lucide-react';
 
@@ -73,16 +74,8 @@ export const DecorationsPage: React.FC = () => {
 
   useEffect(() => {
     if (location.hash) {
-      const hash = location.hash.replace('#', '');
-      // Map old aliases if needed
-      const aliasMap: Record<string, string> = {
-        wedding: 'ceremonies',
-        birthday: 'milestones',
-        flowers: 'florals',
-        balloons: 'ambient',
-      };
-      const targetId = aliasMap[hash] || hash;
-      const el = document.getElementById(targetId) || document.getElementById(hash);
+      const targetId = resolveThemeSectionId(location.hash);
+      const el = document.getElementById(targetId) || document.getElementById(location.hash.replace('#', ''));
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
       }

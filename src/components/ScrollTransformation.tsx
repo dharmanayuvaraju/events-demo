@@ -21,7 +21,7 @@ const STORY_CHAPTERS: StoryChapter[] = [
     index: '01',
     title: 'The setting',
     headline: 'An open garden, ready for a new idea.',
-    description: 'A serene expanse framed by mature trees, waiting for ceremonial architecture to take shape.',
+    description: 'An open lawn framed by mature trees, waiting for ceremonial architecture to take shape.',
     stillDesktop: '/media/celebration/01-venue.jpg',
     stillMobile: '/media/celebration/01-venue-mobile.jpg',
   },
@@ -32,7 +32,7 @@ const STORY_CHAPTERS: StoryChapter[] = [
     index: '02',
     title: 'Floral styling',
     headline: 'An ivory floral arch frames the ceremony.',
-    description: 'Sculptural botanicals and cascading ivory blossoms anchor the sacred altar.',
+    description: 'Cascading ivory blossoms and sculptural botanicals anchor the sacred altar.',
     stillDesktop: '/media/celebration/02-florals.jpg',
     stillMobile: '/media/celebration/02-florals-mobile.jpg',
   },
@@ -43,7 +43,7 @@ const STORY_CHAPTERS: StoryChapter[] = [
     index: '03',
     title: 'The details',
     headline: 'Tables, candlelight and aisle styling complete the setting.',
-    description: 'Loomed linen table settings, delicate glassware, and ambient taper candles introduce intimate human scale.',
+    description: 'Linen table settings, glassware, and ambient taper candles introduce intimate human scale.',
     stillDesktop: '/media/celebration/03-tables.jpg',
     stillMobile: '/media/celebration/03-tables-mobile.jpg',
   },
@@ -61,7 +61,7 @@ const STORY_CHAPTERS: StoryChapter[] = [
 ];
 
 export const ScrollTransformation: React.FC = () => {
-  // Check user environment preferences
+  // Check user environment preferences (reduced motion or save-data)
   const [mode, setMode] = useState<'animation' | 'static'>(() => {
     if (typeof window !== 'undefined') {
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -72,6 +72,10 @@ export const ScrollTransformation: React.FC = () => {
     return 'animation';
   });
 
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    return typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  });
+
   const [videoSrc, setVideoSrc] = useState<string>('');
   const [activeVideoSrc, setActiveVideoSrc] = useState<string>('');
   const [isVideoReady, setIsVideoReady] = useState<boolean>(false);
@@ -80,24 +84,37 @@ export const ScrollTransformation: React.FC = () => {
 
   // DOM Refs
   const sectionRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const stickyContainerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Seeking & Sync State Refs
   const isNearViewport = useRef<boolean>(false);
   const isSeekingRef = useRef<boolean>(false);
   const pendingTimeRef = useRef<number | null>(null);
+  const lastTargetTimeRef = useRef<number>(-1);
+  const lastCalculatedProgressRef = useRef<number>(0);
   const rafIdRef = useRef<number | null>(null);
   const isDocumentVisibleRef = useRef<boolean>(true);
 
-  // Determine single video source (avoiding dual download)
+  // Choose single video source and responsive poster
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const isMobile = window.innerWidth < 768;
-    const src = isMobile
-      ? '/media/celebration/celebration-mobile.mp4'
-      : '/media/celebration/celebration-desktop.mp4';
-    setVideoSrc(src);
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      const chosenSrc = mobile
+        ? '/media/celebration/celebration-mobile.mp4'
+        : '/media/celebration/celebration-desktop.mp4';
+      setVideoSrc(chosenSrc);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Track document visibility
+  // Track document visibility to pause scrubbing when tab is hidden
   useEffect(() => {
     const handleVisChange = () => {
       isDocumentVisibleRef.current = document.visibilityState === 'visible';
@@ -122,7 +139,7 @@ export const ScrollTransformation: React.FC = () => {
           setActiveVideoSrc((prev) => prev || videoSrc);
         }
       },
-      { rootMargin: '400px 0px' }
+      { rootMargin: '300px 0px' }
     );
 
     observer.observe(section);
@@ -137,7 +154,7 @@ export const ScrollTransformation: React.FC = () => {
     }
   }, [activeVideoSrc]);
 
-  // Handle seek completion safely
+  // Coalesced seek completion handler
   const handleSeeked = useCallback(() => {
     const video = videoRef.current;
     if (pendingTimeRef.current !== null) {
@@ -155,14 +172,29 @@ export const ScrollTransformation: React.FC = () => {
     }
   }, []);
 
-  // Seek safely with update coalescing
+  // Stall recovery: if seeking flag stays stuck for >350ms, release it
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isSeekingRef.current && videoRef.current && !videoRef.current.seeking) {
+        isSeekingRef.current = false;
+      }
+    }, 350);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Execute seeking with coalescing
   const seekToTime = useCallback((targetTime: number) => {
     const video = videoRef.current;
     if (!video || videoLoadError) return;
     if (video.readyState < 1 && !isVideoReady) return;
 
-    const maxDuration = (video.duration || 10) - 0.04;
+    const duration = video.duration || 10;
+    const maxDuration = Math.max(0, duration - 0.04);
     const clampedTime = Math.max(0, Math.min(targetTime, maxDuration));
+
+    // Avoid duplicate seek if time delta is negligible
+    if (Math.abs(clampedTime - lastTargetTimeRef.current) < 0.02) return;
+    lastTargetTimeRef.current = clampedTime;
 
     if (isSeekingRef.current) {
       pendingTimeRef.current = clampedTime;
@@ -176,7 +208,42 @@ export const ScrollTransformation: React.FC = () => {
     }
   }, [isVideoReady, videoLoadError]);
 
-  // Native Scroll Scrubbing Controller
+  // Unified Scroll & Progress Calculation over the Containing Track
+  const calculateAndApplyProgress = useCallback(() => {
+    if (mode === 'static') return;
+    const track = trackRef.current;
+    const sticky = stickyContainerRef.current;
+    if (!track || !sticky) return;
+
+    const rect = track.getBoundingClientRect();
+    const headerOffset = 76; // Height clearance for sticky navigation
+    const stickyHeight = sticky.offsetHeight || 500;
+    const totalTravel = rect.height - stickyHeight;
+
+    if (totalTravel <= 0) return;
+
+    // Progress:
+    // When track.top reaches headerOffset, progress = 0.
+    // When track.bottom reaches headerOffset + stickyHeight, progress = 1.
+    const progress = Math.max(0, Math.min(1, (headerOffset - rect.top) / totalTravel));
+    lastCalculatedProgressRef.current = progress;
+
+    // Map progress to video playback time (0 to duration - epsilon)
+    const duration = videoRef.current?.duration || 10;
+    const targetSeconds = progress * (duration - 0.04);
+    seekToTime(targetSeconds);
+
+    // Update active chapter display
+    let activeChap = 0;
+    for (let i = 0; i < STORY_CHAPTERS.length; i++) {
+      if (targetSeconds >= STORY_CHAPTERS[i].time - 0.35) {
+        activeChap = i;
+      }
+    }
+    setActiveChapterIndex(activeChap);
+  }, [mode, seekToTime]);
+
+  // Native Scroll Listener via requestAnimationFrame
   useEffect(() => {
     if (mode === 'static') return;
 
@@ -186,48 +253,31 @@ export const ScrollTransformation: React.FC = () => {
 
       rafIdRef.current = requestAnimationFrame(() => {
         rafIdRef.current = null;
-        const section = sectionRef.current;
-        if (!section) return;
-
-        const rect = section.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        const scrollDistance = rect.height - viewportHeight;
-
-        if (scrollDistance <= 0) return;
-
-        // Progress from 0 (when top of section aligns with top of viewport)
-        // to 1 (when bottom of section reaches bottom of viewport)
-        const progress = Math.max(0, Math.min(1, -rect.top / scrollDistance));
-
-        // Map progress to video duration (approx 10s)
-        const duration = videoRef.current?.duration || 10;
-        const targetSeconds = progress * (duration - 0.05);
-
-        seekToTime(targetSeconds);
-
-        // Update active chapter state
-        let currentChapter = 0;
-        for (let i = 0; i < STORY_CHAPTERS.length; i++) {
-          if (targetSeconds >= STORY_CHAPTERS[i].time - 0.3) {
-            currentChapter = i;
-          }
-        }
-        setActiveChapterIndex(currentChapter);
+        calculateAndApplyProgress();
       });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll, { passive: true });
+    window.addEventListener('orientationchange', handleScroll, { passive: true });
 
-    // Initial check
-    handleScroll();
+    // Initial resync
+    calculateAndApplyProgress();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
+      window.removeEventListener('orientationchange', handleScroll);
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     };
-  }, [mode, seekToTime]);
+  }, [mode, calculateAndApplyProgress]);
+
+  // Resync when video becomes ready
+  useEffect(() => {
+    if (isVideoReady) {
+      calculateAndApplyProgress();
+    }
+  }, [isVideoReady, calculateAndApplyProgress]);
 
   const scrollToNextSection = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -236,6 +286,10 @@ export const ScrollTransformation: React.FC = () => {
       target.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  const posterPath = isMobile
+    ? '/media/celebration/celebration-poster-mobile.jpg'
+    : '/media/celebration/celebration-poster.jpg';
 
   return (
     <section
@@ -311,11 +365,11 @@ export const ScrollTransformation: React.FC = () => {
         )}
 
         {/* =================================================================
-            VIEW 1: ANIMATION MODE (Bounded CSS Sticky Native Scrubbing)
+            VIEW 1: ANIMATION MODE (Deliberate Story Track with Sticky Stage)
             ================================================================= */}
         {mode === 'animation' && (
-          <div className="transformation-sticky-wrapper">
-            <div className="sticky-stage-container">
+          <div className="transformation-story-track" ref={trackRef}>
+            <div className="sticky-stage-container" ref={stickyContainerRef}>
               {/* Media Column: Landscape Video with Stable Aspect Ratio & Poster */}
               <div className="stage-media-col">
                 <div className="stage-video-frame">
@@ -325,7 +379,7 @@ export const ScrollTransformation: React.FC = () => {
                     muted
                     playsInline
                     preload="metadata"
-                    poster="/media/celebration/celebration-poster.jpg"
+                    poster={posterPath}
                     className="stage-video"
                     aria-label="Scroll-scrubbed wedding transformation animation"
                     onLoadedMetadata={() => setIsVideoReady(true)}
@@ -340,9 +394,11 @@ export const ScrollTransformation: React.FC = () => {
                   {!isVideoReady && (
                     <div className="stage-poster-scrim" aria-hidden="true">
                       <img
-                        src="/media/celebration/celebration-poster.jpg"
+                        src={posterPath}
                         alt="Initial ceremonial setting overview"
                         className="stage-poster-img"
+                        width={isMobile ? 768 : 1280}
+                        height={isMobile ? 432 : 720}
                       />
                     </div>
                   )}
@@ -353,7 +409,7 @@ export const ScrollTransformation: React.FC = () => {
                 </div>
 
                 <div className="stage-transparency-note">
-                  <span>AI-generated conceptual visualization &bull; Illustrates staging progression</span>
+                  <span>Illustrative concept animation. Not a completed A3Y event.</span>
                 </div>
               </div>
 

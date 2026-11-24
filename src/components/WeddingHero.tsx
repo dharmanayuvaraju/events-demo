@@ -14,10 +14,10 @@ export const WeddingHero: React.FC = () => {
 
   return (
     <section className="wedding-hero" aria-label="Scenic Wedding Editorial Hero">
-      {/* Background Scenic Wedding Photo with Calm Warm Dark Tint */}
+      {/* Background Scenic Wedding Ceremony Photo with Calm Warm Dark Tint */}
       <div className="wedding-hero-bg-frame" aria-hidden="true">
         <img
-          src="/portfolio/photo_dinner_canopy_evening.jpg"
+          src="/portfolio/photo_scenic_aisle_ceremony.jpg"
           alt=""
           className="wedding-hero-bg-img"
           loading="eager"
@@ -70,7 +70,7 @@ export const WeddingHero: React.FC = () => {
 
         {/* Honest Image Caption & Photographer Credit */}
         <div className="wedding-hero-caption" aria-label="Hero photograph context">
-          <span>Plate: Ambient evening banquet canopy &bull; Curated for demo inspiration via Unsplash</span>
+          <span>Plate: Open-air ceremony aisle &amp; floral staging &bull; Curated for demo inspiration via Unsplash (Photo by Sandy Millar)</span>
         </div>
       </div>
     </section>

@@ -72,7 +72,7 @@ export const AboutPage: React.FC = () => {
             </div>
             <h3 className="feature-title">Strict TypeScript &amp; a11y</h3>
             <p className="feature-text">
-              100% type-safe codebase with strict compilation. Implements accessible keyboard focus traps, ARIA landmarks, native dialog modal lightboxes, and WCAG AA/AAA verified contrast ratios.
+              Type-safe React codebase with strict compilation. Implements accessible keyboard navigation, ARIA landmarks, and native HTML5 &lt;dialog&gt; modals with focus management.
             </p>
           </div>
         </div>
@@ -114,7 +114,7 @@ export const AboutPage: React.FC = () => {
                 <dd>React 18 &bull; TypeScript &bull; Vite</dd>
 
                 <dt>Visual &amp; Motion:</dt>
-                <dd>CSS Transforms &bull; GSAP &bull; Native Dialog</dd>
+                <dd>Semantic CSS &bull; Native Scroll Scrubbing &bull; HTML5 Dialog</dd>
 
                 <dt>Typography:</dt>
                 <dd>Fraunces &bull; Plus Jakarta Sans</dd>

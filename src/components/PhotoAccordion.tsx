@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ACCORDION_ITEMS } from '../data/assetsManifest';
 import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
@@ -7,38 +7,87 @@ export const PhotoAccordion: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
+  
+  // Guard against mount-time scroll: never auto-scroll the document or container on initial mount!
+  const isInitialMount = useRef<boolean>(true);
+  // Guard against scroll feedback loop when user manually swipes
+  const isProgrammaticScroll = useRef<boolean>(false);
+  const scrollTimeoutRef = useRef<number | null>(null);
 
   // Effective displayed index: hovered on pointer desktop, or active on click/keyboard
   const displayIndex = hoveredIndex !== null ? hoveredIndex : activeIndex;
 
-  const goToPrev = () => {
-    setActiveIndex((prev) => (prev - 1 + ACCORDION_ITEMS.length) % ACCORDION_ITEMS.length);
-    setHoveredIndex(null);
-  };
-
-  const goToNext = () => {
-    setActiveIndex((prev) => (prev + 1) % ACCORDION_ITEMS.length);
-    setHoveredIndex(null);
-  };
-
-  // Sync mobile horizontal scroll when activeIndex changes
-  useEffect(() => {
+  // Horizontal container scrolling only - NEVER scrollIntoView or vertical document scroll
+  const scrollContainerToCard = useCallback((index: number) => {
     const el = mobileScrollRef.current;
     if (!el || window.innerWidth >= 860) return;
 
     const cards = el.querySelectorAll<HTMLElement>('.mobile-accordion-card');
-    const targetCard = cards[activeIndex];
+    const targetCard = cards[index];
     if (targetCard) {
-      targetCard.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'start',
+      isProgrammaticScroll.current = true;
+      const cardLeft = targetCard.offsetLeft - el.offsetLeft;
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      el.scrollTo({
+        left: cardLeft,
+        behavior: prefersReduced ? 'auto' : 'smooth',
       });
+
+      if (scrollTimeoutRef.current) window.clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = window.setTimeout(() => {
+        isProgrammaticScroll.current = false;
+      }, 400);
     }
-  }, [activeIndex]);
+  }, []);
+
+  const goToPrev = () => {
+    const newIdx = (activeIndex - 1 + ACCORDION_ITEMS.length) % ACCORDION_ITEMS.length;
+    setActiveIndex(newIdx);
+    setHoveredIndex(null);
+    scrollContainerToCard(newIdx);
+  };
+
+  const goToNext = () => {
+    const newIdx = (activeIndex + 1) % ACCORDION_ITEMS.length;
+    setActiveIndex(newIdx);
+    setHoveredIndex(null);
+    scrollContainerToCard(newIdx);
+  };
+
+  const handleSelectPanel = (index: number) => {
+    setActiveIndex(index);
+    setHoveredIndex(null);
+    scrollContainerToCard(index);
+  };
+
+  // Sync mobile horizontal scroll only after initial mount upon intentional state changes
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+  }, []);
+
+  // Listen to mobile horizontal scroll when user swipes cards directly
+  const handleMobileScroll = () => {
+    if (isProgrammaticScroll.current) return;
+    const el = mobileScrollRef.current;
+    if (!el) return;
+
+    const scrollLeft = el.scrollLeft;
+    const firstCard = el.querySelector<HTMLElement>('.mobile-accordion-card');
+    const cardWidth = firstCard ? firstCard.offsetWidth + 16 : 300;
+    const index = Math.round(scrollLeft / cardWidth);
+    const clamped = Math.max(0, Math.min(ACCORDION_ITEMS.length - 1, index));
+
+    if (clamped !== activeIndex) {
+      setActiveIndex(clamped);
+    }
+  };
 
   return (
-    <section className="section-accordion" aria-labelledby="accordion-section-title">
+    <section id="accordion-section" className="section-accordion" aria-labelledby="accordion-section-title">
       <div className="container">
         {/* Editorial Section Header */}
         <div className="accordion-header-row">
@@ -98,6 +147,9 @@ export const PhotoAccordion: React.FC = () => {
           {ACCORDION_ITEMS.map((item, idx) => {
             const isExpanded = idx === displayIndex;
 
+            // When collapsed, the panel functions as an accessible button trigger (with Enter/Space).
+            // When expanded, the panel acts as a container holding the editorial card and action link,
+            // avoiding nested interactive button elements.
             return (
               <div
                 key={item.id}
@@ -105,16 +157,23 @@ export const PhotoAccordion: React.FC = () => {
                 style={{
                   height: `${isExpanded ? 540 : item.desktopHeight}px`,
                 }}
+                tabIndex={isExpanded ? -1 : 0}
+                role={isExpanded ? 'group' : 'button'}
+                aria-label={`Panel ${item.index}: ${item.title}`}
+                aria-expanded={isExpanded}
                 onClick={() => {
-                  setActiveIndex(idx);
-                  setHoveredIndex(null);
+                  if (!isExpanded) handleSelectPanel(idx);
+                }}
+                onKeyDown={(e) => {
+                  if (!isExpanded && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    handleSelectPanel(idx);
+                  }
                 }}
                 onMouseEnter={() => setHoveredIndex(idx)}
-                onFocus={() => setActiveIndex(idx)}
-                tabIndex={0}
-                role="button"
-                aria-expanded={isExpanded}
-                aria-label={`Panel ${item.index}: ${item.title}`}
+                onFocus={() => {
+                  if (!isExpanded) setActiveIndex(idx);
+                }}
               >
                 {/* Background Photography with Zoom Ease */}
                 <div className="panel-img-wrap">
@@ -152,7 +211,6 @@ export const PhotoAccordion: React.FC = () => {
                         <Link
                           to={item.route}
                           className="btn-editorial-explore"
-                          onClick={(e) => e.stopPropagation()}
                         >
                           <span>Explore Theme Details</span>
                           <ArrowUpRight size={14} />
@@ -177,12 +235,13 @@ export const PhotoAccordion: React.FC = () => {
           className="mobile-accordion-scroller"
           role="region"
           aria-label="Swipeable celebration panels"
+          onScroll={handleMobileScroll}
         >
           {ACCORDION_ITEMS.map((item, idx) => (
             <article
               key={item.id}
               className={`mobile-accordion-card ${idx === activeIndex ? 'mobile-card-selected' : ''}`}
-              onClick={() => setActiveIndex(idx)}
+              onClick={() => handleSelectPanel(idx)}
             >
               <div className="mobile-card-media">
                 <img
@@ -227,7 +286,7 @@ export const PhotoAccordion: React.FC = () => {
               aria-selected={idx === activeIndex}
               aria-label={`Jump to panel ${idx + 1}`}
               className={`mobile-dot ${idx === activeIndex ? 'active' : ''}`}
-              onClick={() => setActiveIndex(idx)}
+              onClick={() => handleSelectPanel(idx)}
             />
           ))}
         </div>

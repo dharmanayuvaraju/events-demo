@@ -1,8 +1,8 @@
 # A3Y Celebrations — Event Studio Concept Demonstration
 
-A calm, editorial celebration web application designed and engineered by **A3Y Solutions**. Built with React 18, TypeScript, Vite, native scroll-scrubbing controllers, and semantic responsive CSS.
+A calm, wedding-editorial celebration web application designed and engineered by **A3Y Solutions**. Built with React 18, TypeScript, Vite, native scroll-scrubbing controllers, and semantic responsive CSS.
 
-> **Demonstration Notice:** This is a fictional event-studio website demonstrating A3Y Solutions' design, typography, and frontend engineering capabilities. It is not an operational events company or a paid client project. Search indexing is disabled (`<meta name="robots" content="noindex, follow" />`).
+> **Demonstration Notice:** This is a fictional event-studio website demonstrating A3Y Solutions' design, typography, and frontend engineering capabilities. It is not an operational events company or a commercial client project. Search indexing is disabled (`<meta name="robots" content="noindex, follow" />`).
 
 ---
 
@@ -24,10 +24,10 @@ A calm, editorial celebration web application designed and engineered by **A3Y S
 - **Palette:** Warm ivory (`#FAF7F2`), deep forest green (`#1F2921`), restrained warm gold (`#C29B68`), and dark charcoal ink (`#181D19`).
 - **Typography:** High-contrast display serif **Fraunces** paired with modern legible sans-serif **Plus Jakarta Sans**.
 - **Header:** Slim 64px deep forest green header with brand wordmark, demo badge, compact navigation, and direct developer contact button.
-- **Hero:** Scenic evening banquet canopy photograph with unhurried typography and clear calls to action.
+- **Hero:** Scenic outdoor wedding ceremony aisle photograph with unhurried typography and clear calls to action.
 - **Category Overview:** 4 distinct architectural disciplines with material palettes and specifications.
 - **Editorial Split:** Asymmetric layout articulating studio design philosophy and reverent spatial staging.
-- **Expanding Photo Accordion:** 7 tall desktop panels with staggered heights (490px–540px), vertical inactive labels, smooth 550ms horizontal expansion, prev/next buttons, and mobile swipeable card strip.
+- **Expanding Photo Accordion:** 7 tall desktop panels with staggered heights (490px–540px), vertical inactive labels, smooth 550ms horizontal expansion, prev/next buttons, and mobile swipeable card strip without mount-time page jump.
 - **Immersive Photo Wall:** 9-tile asymmetrical mosaic with bounded pointer pan, gentle continuous drift, motion pause button, and accessible native HTML5 `<dialog>` lightbox.
 - **Closing Enquiry Section:** Forest green closing card connecting visitors directly with developer Yuvaraj for web engineering inquiries.
 
@@ -35,7 +35,7 @@ A calm, editorial celebration web application designed and engineered by **A3Y S
 
 ## 3. Scroll-Controlled Wedding Transformation
 
-- **Bounded Scrollytelling:** Native scroll-scrubbing stage that maps normalized scroll progress to video playback time (0.0s to 9.95s).
+- **Bounded Scrollytelling:** Native scroll-scrubbing stage contained within a dedicated 320vh story track that maps normalized scroll progress to video playback time (0.0s to 9.95s).
 - **Single Source Resolution:** Selects `celebration-desktop.mp4` (1280×720) or `celebration-mobile.mp4` (768×432) based on viewport width to eliminate redundant bandwidth consumption.
 - **Bidirectional Scrubbing:** Forward scrolling reveals staging progression; reverse scrolling scrubs backwards; pausing holds the exact frame.
 - **Chapters & Timestamps:**
@@ -49,12 +49,12 @@ A calm, editorial celebration web application designed and engineered by **A3Y S
 
 ---
 
-## 4. Engineering & Quality Standards
+## 4. Engineering Standards
 
-- **Zero Horizontal Overflow:** Verified across 320px, 360px, 390px, 412px, 768px, 844px, 1440px, 1920px, and 2560px viewports (`scrollWidth <= clientWidth`).
-- **Accessibility:** Complete keyboard focus trapping in mobile drawer, semantic headings, visible focus rings, native `<dialog>` light dismiss, and WCAG AA/AAA verified contrast ratios.
-- **Performance:** Sub-300ms First Contentful Paint (FCP) and sub-60ms DOMContentLoaded on production build.
+- **Zero Layout Shifts on Load:** Initial mobile loads preserve vertical viewport position at top (`scrollY = 0`).
+- **Accessible Navigation:** Complete keyboard focus management in mobile drawer, semantic headings, visible focus rings, native `<dialog>` light dismiss, and Enter/Space support on interactive cards.
 - **Strict TypeScript:** 100% type-safe compilation with strict mode.
+- **SPA Fallback Routing:** Supported rewrite configuration in `vercel.json` excluding assets and media while routing all client routes to `/index.html`.
 
 ---
 

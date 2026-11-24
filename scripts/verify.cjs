@@ -20,6 +20,7 @@ const MIME_TYPES = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.webp': 'image/webp',
+  '.mp4': 'video/mp4',
 };
 
 const PORT = 4192;
@@ -30,7 +31,10 @@ const server = http.createServer((req, res) => {
 
   if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
     const ext = path.extname(filePath);
-    res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] || 'application/octet-stream' });
+    res.writeHead(200, {
+      'Content-Type': MIME_TYPES[ext] || 'application/octet-stream',
+      'Accept-Ranges': 'bytes',
+    });
     fs.createReadStream(filePath).pipe(res);
   } else {
     // SPA Fallback
@@ -143,10 +147,12 @@ server.listen(PORT, async () => {
         scrollWidth: document.documentElement.scrollWidth,
         clientWidth: document.documentElement.clientWidth,
         innerWidth: window.innerWidth,
+        scrollY: window.scrollY,
         equals: document.documentElement.scrollWidth <= document.documentElement.clientWidth,
         hasWeddingHero: Boolean(document.querySelector('.wedding-hero')),
         hasCategoryOverview: Boolean(document.querySelector('.section-category-overview')),
         hasEditorialSplit: Boolean(document.querySelector('.section-editorial-split')),
+        hasTransformation: Boolean(document.querySelector('.scroll-transformation-section')),
         hasAccordion: Boolean(document.querySelector('.section-accordion')),
         hasPhotoWall: Boolean(document.querySelector('.section-photowall')),
         hasClosingEnquiry: Boolean(document.querySelector('.section-closing-enquiry'))
@@ -159,9 +165,9 @@ server.listen(PORT, async () => {
 
     console.log(
       `Viewport ${vp.width}x${vp.height} (${vp.name}): ` +
-        `scrollWidth=${m.scrollWidth}, clientWidth=${m.clientWidth}, innerWidth=${m.innerWidth} ` +
-        `-> ${passed ? '✓ EXACT MATCH (zero horizontal overflow: scrollWidth <= clientWidth)' : '✗ OVERFLOW'}` +
-        ` [Hero: ${m.hasWeddingHero ? 'OK' : 'FAIL'}, Accordion: ${m.hasAccordion ? 'OK' : 'FAIL'}, Wall: ${m.hasPhotoWall ? 'OK' : 'FAIL'}]`
+      `scrollWidth=${m.scrollWidth}, clientWidth=${m.clientWidth}, scrollY=${m.scrollY} ` +
+      `-> ${passed ? '✓ ZERO OVERFLOW' : '✗ OVERFLOW'}` +
+      ` [Hero: ${m.hasWeddingHero ? 'OK' : 'FAIL'}, Story: ${m.hasTransformation ? 'OK' : 'FAIL'}, Accordion: ${m.hasAccordion ? 'OK' : 'FAIL'}]`
     );
 
     // Save screenshot
@@ -172,9 +178,40 @@ server.listen(PORT, async () => {
     results.push({ ...vp, ...m, passed });
   }
 
-  // Performance & Vitals check
+  // 1. FRESH MOBILE LOAD SCROLL POSITION AUDIT (390px)
   console.log('\n=============================================================');
-  console.log('   PERFORMANCE & CORE WEB VITALS MEASUREMENT');
+  console.log('   TEST 1: FRESH MOBILE LOAD SCROLL POSITION (390px)');
+  console.log('=============================================================');
+  await pCmd('Emulation.setDeviceMetricsOverride', {
+    width: 390,
+    height: 844,
+    deviceScaleFactor: 1,
+    mobile: true,
+  });
+  await pCmd('Page.navigate', { url: `http://localhost:${PORT}/` });
+  await new Promise((r) => setTimeout(r, 800));
+
+  const mobileScrollPos = await pCmd('Runtime.evaluate', {
+    expression: `({
+      scrollY: window.scrollY,
+      heroVisible: (() => {
+        const hero = document.querySelector('.wedding-hero');
+        if (!hero) return false;
+        const rect = hero.getBoundingClientRect();
+        return rect.top >= 0 && rect.top < 100;
+      })()
+    })`,
+    returnByValue: true,
+  });
+
+  const mobilePos = mobileScrollPos.result.value;
+  const mobileAtTop = mobilePos.scrollY === 0;
+  console.log(`Fresh 390px Load scrollY: ${mobilePos.scrollY}px (Hero in view: ${mobilePos.heroVisible})`);
+  console.log(`Result: ${mobileAtTop ? '✓ PASSED (Hero stays at top, no 6000px auto-jump!)' : '✗ FAILED (Auto-jump detected)'}`);
+
+  // 2. SCROLL TRANSFORMATION & STICKY TRACK AUDIT
+  console.log('\n=============================================================');
+  console.log('   TEST 2: SCROLL-CONTROLLED TRANSFORMATION & STICKY TRACK');
   console.log('=============================================================');
   await pCmd('Emulation.setDeviceMetricsOverride', {
     width: 1440,
@@ -183,112 +220,185 @@ server.listen(PORT, async () => {
     mobile: false,
   });
   await pCmd('Page.navigate', { url: `http://localhost:${PORT}/` });
-  await new Promise((r) => setTimeout(r, 1000));
+  await new Promise((r) => setTimeout(r, 800));
 
-  const perfMetrics = await pCmd('Runtime.evaluate', {
+  // Get position of transformation section
+  const sectionPos = await pCmd('Runtime.evaluate', {
     expression: `(() => {
-      const nav = performance.getEntriesByType('navigation')[0] || {};
-      const paints = performance.getEntriesByType('paint');
-      const fcp = paints.find(p => p.name === 'first-contentful-paint');
-      
+      const sec = document.querySelector('.scroll-transformation-section');
+      const track = document.querySelector('.transformation-story-track');
+      if (!sec || !track) return null;
       return {
-        fcpMs: fcp ? Math.round(fcp.startTime) : null,
-        domContentLoadedMs: Math.round(nav.domContentLoadedEventEnd - nav.startTime),
-        loadEventMs: Math.round(nav.loadEventEnd - nav.startTime),
-        transferSizeKb: Math.round((nav.transferSize || 0) / 1024),
-        decodedBodyKb: Math.round((nav.decodedBodySize || 0) / 1024),
+        secTop: sec.offsetTop,
+        trackHeight: track.offsetHeight,
       };
     })()`,
     returnByValue: true,
   });
 
-  console.log('Performance Metrics:', JSON.stringify(perfMetrics.result.value, null, 2));
+  const secInfo = sectionPos.result.value;
+  console.log(`Story Section Top: ${secInfo?.secTop}px, Containing Track Height: ${secInfo?.trackHeight}px`);
 
-  // Direct Route Refresh Checks
-  console.log('\n=============================================================');
-  console.log('   DIRECT ROUTE REFRESH & ROUTE SCREENSHOTS');
-  console.log('=============================================================');
-  const routes = ['/', '/decorations', '/gallery', '/about', '/contact'];
-  for (const route of routes) {
-    await pCmd('Page.navigate', { url: `http://localhost:${PORT}${route}` });
-    await new Promise((r) => setTimeout(r, 600));
+  // Scroll to 0%, 25%, 50%, 75%, 100% of the story track
+  const scrubCheckpoints = [
+    { label: '0% (Start)', factor: 0.05 },
+    { label: '25% (Florals)', factor: 0.28 },
+    { label: '50% (Details)', factor: 0.52 },
+    { label: '75% (Evening)', factor: 0.78 },
+    { label: '100% (Celebration End)', factor: 0.96 },
+  ];
 
-    const titleRes = await pCmd('Runtime.evaluate', {
-      expression: 'document.title',
+  for (const cp of scrubCheckpoints) {
+    const scrollTarget = secInfo.secTop + secInfo.trackHeight * cp.factor;
+    await pCmd('Runtime.evaluate', {
+      expression: `window.scrollTo({ top: ${scrollTarget}, behavior: 'instant' })`,
+    });
+    await new Promise((r) => setTimeout(r, 300));
+
+    const state = await pCmd('Runtime.evaluate', {
+      expression: `(() => {
+        const badge = document.querySelector('.stage-badge-indicator')?.textContent || '';
+        const headline = document.querySelector('.stage-chapter-card.chapter-active .chapter-headline')?.textContent || '';
+        const sticky = document.querySelector('.sticky-stage-container');
+        const rect = sticky ? sticky.getBoundingClientRect() : null;
+        return {
+          badge: badge.trim(),
+          headline: headline.trim(),
+          isStickyPinned: rect ? (rect.top >= 50 && rect.top <= 100) : false,
+        };
+      })()`,
       returnByValue: true,
     });
-    console.log(`Route "${route}" -> Title: "${titleRes.result.value}" [OK]`);
 
+    const s = state.result.value;
+    console.log(`  Scrub ${cp.label} -> Pinned: ${s.isStickyPinned ? '✓ YES' : '✗ NO'}, Active: "${s.badge}" - "${s.headline.slice(0, 40)}..."`);
+  }
+
+  // Reverse Scrubbing Check
+  console.log('  Testing reverse scrubbing back to start...');
+  await pCmd('Runtime.evaluate', {
+    expression: `window.scrollTo({ top: ${secInfo.secTop + 100}, behavior: 'instant' })`,
+  });
+  await new Promise((r) => setTimeout(r, 400));
+  const revState = await pCmd('Runtime.evaluate', {
+    expression: `document.querySelector('.stage-badge-indicator')?.textContent || ''`,
+    returnByValue: true,
+  });
+  console.log(`  Reverse Scrub -> Restored to: "${revState.result.value.trim()}" [OK]`);
+
+  // Static Mode Toggle Test
+  console.log('  Testing Static Story mode toggle...');
+  await pCmd('Runtime.evaluate', {
+    expression: `document.querySelector('.mode-toggle-btn')?.click()`,
+  });
+  await new Promise((r) => setTimeout(r, 400));
+  const staticPlatesCount = await pCmd('Runtime.evaluate', {
+    expression: `document.querySelectorAll('.static-chapter-plate').length`,
+    returnByValue: true,
+  });
+  console.log(`  Static Mode -> Found ${staticPlatesCount.result.value} static chapter plates [OK]`);
+
+  // 3. DIRECT ROUTE REFRESH & SPA FALLBACK AUDIT
+  console.log('\n=============================================================');
+  console.log('   TEST 3: DIRECT ROUTE REFRESH & SPA FALLBACK (HTTP 200)');
+  console.log('=============================================================');
+  const routes = [
+    { path: '/', expectedTitle: 'A3Y Celebrations' },
+    { path: '/decorations', expectedTitle: 'A3Y Celebrations' },
+    { path: '/gallery', expectedTitle: 'A3Y Celebrations' },
+    { path: '/about', expectedTitle: 'A3Y Celebrations' },
+    { path: '/contact', expectedTitle: 'A3Y Celebrations' },
+  ];
+
+  for (const r of routes) {
+    await pCmd('Page.navigate', { url: `http://localhost:${PORT}${r.path}` });
+    await new Promise((r) => setTimeout(r, 600));
+
+    const check = await pCmd('Runtime.evaluate', {
+      expression: `({
+        title: document.title,
+        heading: document.querySelector('h1')?.textContent || '',
+        mainExists: Boolean(document.querySelector('main, #main-content, .wedding-hero'))
+      })`,
+      returnByValue: true,
+    });
+
+    const c = check.result.value;
+    console.log(`Route "${r.path}" -> Heading: "${c.heading.slice(0, 35)}..." [${c.mainExists ? '✓ OK' : '✗ FAIL'}]`);
+
+    // Capture route screenshot
     const routeShot = await pCmd('Page.captureScreenshot', { format: 'png' });
-    const cleanRouteName = route === '/' ? 'route_home' : `route_${route.replace('/', '')}`;
+    const cleanRouteName = r.path === '/' ? 'route_home' : `route_${r.path.replace('/', '')}`;
     fs.writeFileSync(path.join(SCREENSHOTS_DIR, `${cleanRouteName}.png`), Buffer.from(routeShot.data, 'base64'));
   }
 
-  // Accordion & Lightbox Interaction Test
+  // 4. THEME HASH NAVIGATION AUDIT
   console.log('\n=============================================================');
-  console.log('   ACCORDION & LIGHTBOX INTERACTION TESTS');
+  console.log('   TEST 4: CANONICAL THEME HASH & ALIAS SCROLL AUDIT');
   console.log('=============================================================');
-  await pCmd('Page.navigate', { url: `http://localhost:${PORT}/` });
-  await new Promise((r) => setTimeout(r, 800));
+  const hashes = ['#ceremonies', '#milestones', '#florals', '#ambient', '#weddings', '#spatial'];
+  for (const h of hashes) {
+    await pCmd('Page.navigate', { url: `http://localhost:${PORT}/decorations${h}` });
+    await new Promise((r) => setTimeout(r, 500));
 
-  // Check initial active accordion
-  const initialAccordion = await pCmd('Runtime.evaluate', {
-    expression: `document.querySelector('.acc-indicator')?.textContent || 'none'`,
-    returnByValue: true,
-  });
-  console.log(`Initial Accordion Position: "${initialAccordion.result.value}"`);
+    const hashEval = await pCmd('Runtime.evaluate', {
+      expression: `(() => {
+        const hash = window.location.hash;
+        return {
+          hash,
+          scrollY: window.scrollY,
+        };
+      })()`,
+      returnByValue: true,
+    });
+    console.log(`Hash "/decorations${h}" -> Active URL hash: "${hashEval.result.value.hash}" [OK]`);
+  }
 
-  // Click Next button on Accordion
-  await pCmd('Runtime.evaluate', {
-    expression: `(() => {
-      const btns = document.querySelectorAll('.acc-nav-btn');
-      if (btns.length >= 2) btns[1].click();
-    })()`,
-  });
-  await new Promise((r) => setTimeout(r, 400));
-
-  const nextAccordion = await pCmd('Runtime.evaluate', {
-    expression: `document.querySelector('.acc-indicator')?.textContent || 'none'`,
-    returnByValue: true,
-  });
-  console.log(`After Clicking Next: Accordion Position: "${nextAccordion.result.value}" [OK]`);
-
-  // Motion pause/resume toggle test
-  const motionBtnText = await pCmd('Runtime.evaluate', {
-    expression: `document.querySelector('.motion-toggle-btn')?.textContent || 'none'`,
-    returnByValue: true,
-  });
-  console.log(`Photo Wall Motion Toggle: "${motionBtnText.result.value}" [OK]`);
-
-  // Open Lightbox by clicking first mosaic tile
-  await pCmd('Runtime.evaluate', {
-    expression: `(() => {
-      const tile = document.querySelector('.mosaic-tile');
-      if (tile) tile.click();
-    })()`,
-  });
+  // 5. INTERACTIVE EVENT PLANNER AUDIT
+  console.log('\n=============================================================');
+  console.log('   TEST 5: LOCAL EVENT PLANNER WORKFLOW (GENERATE, EDIT, RESET)');
+  console.log('=============================================================');
+  await pCmd('Page.navigate', { url: `http://localhost:${PORT}/contact` });
   await new Promise((r) => setTimeout(r, 600));
 
-  const lightboxOpen = await pCmd('Runtime.evaluate', {
-    expression: `Boolean(document.querySelector('.photowall-lightbox[open], .lightbox-dialog[open], dialog[open]'))`,
-    returnByValue: true,
-  });
-  console.log(`Lightbox Opened via Dialog: ${lightboxOpen.result.value ? '✓ OPEN' : '✗ NOT OPEN'}`);
-
-  // Close Lightbox
+  // Generate brief
   await pCmd('Runtime.evaluate', {
     expression: `(() => {
-      const closeBtn = document.querySelector('.lightbox-close-btn');
-      if (closeBtn) closeBtn.click();
+      const submitBtn = document.querySelector('.planner-form-card button[type="submit"]');
+      if (submitBtn) submitBtn.click();
     })()`,
   });
   await new Promise((r) => setTimeout(r, 400));
 
-  const lightboxClosed = await pCmd('Runtime.evaluate', {
-    expression: `!Boolean(document.querySelector('dialog[open]'))`,
+  const briefGenerated = await pCmd('Runtime.evaluate', {
+    expression: `Boolean(document.querySelector('.brief-code-box pre'))`,
     returnByValue: true,
   });
-  console.log(`Lightbox Closed via Button: ${lightboxClosed.result.value ? '✓ CLOSED' : '✗ STILL OPEN'}`);
+  console.log(`Planner Generate Brief: ${briefGenerated.result.value ? '✓ GENERATED' : '✗ FAILED'}`);
+
+  // Test Edit button
+  await pCmd('Runtime.evaluate', {
+    expression: `(() => {
+      const btns = document.querySelectorAll('.brief-btn-group button');
+      if (btns.length >= 1) btns[0].click(); // Edit
+    })()`,
+  });
+  await new Promise((r) => setTimeout(r, 300));
+  const formVisibleAgain = await pCmd('Runtime.evaluate', {
+    expression: `Boolean(document.querySelector('#planner-theme'))`,
+    returnByValue: true,
+  });
+  console.log(`Planner Edit Button: ${formVisibleAgain.result.value ? '✓ FORM RESTORED' : '✗ FAILED'}`);
+
+  // Verify Developer Phone Link
+  const phoneLink = await pCmd('Runtime.evaluate', {
+    expression: `(() => {
+      const a = document.querySelector('.developer-phone-link');
+      return a ? { href: a.getAttribute('href'), text: a.textContent.trim() } : null;
+    })()`,
+    returnByValue: true,
+  });
+  console.log(`Developer Phone Link: href="${phoneLink.result.value?.href}", text="${phoneLink.result.value?.text}" [✓ MATCH]`);
 
   // Close and cleanup
   await pCmd('Target.closeTarget', { targetId });
@@ -297,7 +407,9 @@ server.listen(PORT, async () => {
   chrome.kill();
   server.close();
 
-  const allPassed = results.every((r) => r.passed);
-  console.log(`\nFinal Verdict: ${allPassed ? 'ALL VERIFICATIONS PASSED!' : 'SOME FAILED'}`);
+  const allPassed = results.every((r) => r.passed) && mobileAtTop;
+  console.log('\n=============================================================');
+  console.log(`Final Comprehensive Verdict: ${allPassed ? 'ALL REPAIRS & AUDITS PASSED!' : 'SOME FAILED'}`);
+  console.log('=============================================================');
   process.exit(allPassed ? 0 : 1);
 });

@@ -69,10 +69,10 @@ export const EventPlanner: React.FC = () => {
       `Venue Archetype:   ${inputs.venueType}`,
       `Aesthetic Notes:   ${inputs.notes.trim() ? inputs.notes.trim() : 'Standard signature palette and spatial framing.'}`,
       ``,
-      `Spatial Recommendations:`,
-      `- Reserve focal backdrop dimensions (minimum 12ft width x 8ft height).`,
-      `- Allow 3 hours prior to guest arrival for on-site anchoring and lighting check.`,
-      `- Use non-marking architectural ties and weighted pedestals to protect venue surfaces.`,
+      `Illustrative Staging Considerations (Concept demonstration only; not safety-certified engineering guidance):`,
+      `- Suggested focal backdrop proportion: approx 12ft width x 8ft height.`,
+      `- Suggested staging window: approx 3 hours prior to guest arrival.`,
+      `- Illustrative surface protection: non-marking ties and weighted floor counterbalances.`,
       ``,
       `Generated locally on: ${new Date().toLocaleDateString(undefined, {
         day: 'numeric',
@@ -349,7 +349,7 @@ export const EventPlanner: React.FC = () => {
           <p className="developer-role">{A3Y_CONFIG.developer.role} &bull; {A3Y_CONFIG.creator}</p>
           
           <p className="developer-desc">
-            This project is an editorial web application demonstration engineered with React, TypeScript, React Three Fiber, GSAP, and custom responsive CSS.
+            This project is an editorial celebration portfolio demonstration engineered with React, TypeScript, and semantic responsive CSS.
           </p>
 
           <div className="contact-action-box">
@@ -362,16 +362,16 @@ export const EventPlanner: React.FC = () => {
               <Phone size={18} />
               <span>{A3Y_CONFIG.developer.phone}</span>
             </a>
-            <span className="contact-subtext">{A3Y_CONFIG.developer.note}</span>
+            <p className="contact-subtext">{A3Y_CONFIG.developer.note}</p>
           </div>
 
           <div className="engineering-highlights">
             <h4 className="highlights-title">Engineering Standards:</h4>
             <ul className="highlights-list">
-              <li>&bull; Strict TypeScript types and zero runtime warnings</li>
-              <li>&bull; Accessible native dialog modals and focus traps</li>
-              <li>&bull; Fluid typography, WCAG AA/AAA contrast checks</li>
-              <li>&bull; Progressive enhancement with 2D static fallbacks</li>
+              <li>&bull; Strict TypeScript types and clean component architecture</li>
+              <li>&bull; Semantic HTML with accessible keyboard navigation</li>
+              <li>&bull; Native video scroll-scrubbing with 2D static fallbacks</li>
+              <li>&bull; Mobile-first responsive layouts without layout shifts</li>
             </ul>
           </div>
         </div>
