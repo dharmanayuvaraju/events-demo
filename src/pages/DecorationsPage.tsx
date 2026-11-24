@@ -1,19 +1,90 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { REEL_CHAPTERS } from '../data/chapters';
 import { ASSETS_MANIFEST } from '../data/assetsManifest';
 import { DecorArtwork } from '../components/DecorArtwork';
-import { ArrowUpRight, Check, ShieldAlert, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Sparkles, Check } from 'lucide-react';
+
+interface ThemeSpec {
+  id: string;
+  index: string;
+  title: string;
+  subtitle: string;
+  quote: string;
+  description: string;
+  categoryKey: 'weddings' | 'milestones' | 'florals' | 'spatial';
+  focalPoint: string;
+  anchoring: string;
+  paletteNotes: string;
+}
+
+const THEME_SPECS: ThemeSpec[] = [
+  {
+    id: 'ceremonies',
+    index: '01',
+    title: 'Sacred Ceremonies & Mandaps',
+    subtitle: 'Ceremonial Pavilions & Ritual Staging',
+    quote: 'A sacred focal point anchored in natural reverence.',
+    description: 'Bespoke four-pillar and canopy mandaps crafted from seasoned teakwood, adorned with auspicious marigold garlands, white jasmine cascades, and raw silk drapery.',
+    categoryKey: 'weddings',
+    focalPoint: '12ft x 12ft raised ceremonial platform with brass urns and natural linen runners.',
+    anchoring: 'Self-supporting weighted bases with non-marking footings for lawn and marble protection.',
+    paletteNotes: 'Warm ivory (#FAF7F2), golden marigold, muted olive, and brushed brass.',
+  },
+  {
+    id: 'milestones',
+    index: '02',
+    title: 'Milestone Celebrations & Receptions',
+    subtitle: 'Intimate Stages & Banquets',
+    quote: 'Generational gatherings framed with unhurried grace.',
+    description: 'Circular geometric staging with soft curved backdrops, ambient cylinder plinths, and bespoke seating configurations that foster natural guest mingling.',
+    categoryKey: 'milestones',
+    focalPoint: 'Circular portal backdrop with gentle halo backlighting and minimalist cake plinth.',
+    anchoring: 'Modular interlocking steel frames with weighted counterbalances concealed within plinths.',
+    paletteNotes: 'Alabaster, dusty rose, champagne parchment, and soft charcoal ink.',
+  },
+  {
+    id: 'florals',
+    index: '03',
+    title: 'Botanical Architecture & Torans',
+    subtitle: 'Sculptural Cascades & Living Installations',
+    quote: 'Organic movement celebrating native blooms.',
+    description: 'Asymmetrical botanical arches and cascading door torans crafted with fresh seasonal blossoms, fragrant tuberose, mango foliage, and sculptural branches.',
+    categoryKey: 'florals',
+    focalPoint: 'Cascading entry torans and free-standing floral columns welcoming guests.',
+    anchoring: 'Eco-conscious moss armature with internal hydration tubes and biodegradable cotton ties.',
+    paletteNotes: 'Fresh yellow and orange marigold, jasmine cream, forest foliage, and clay terracotta.',
+  },
+  {
+    id: 'ambient',
+    index: '04',
+    title: 'Ambient Illumination & Canopies',
+    subtitle: 'Evening Canopies & Banquet Staging',
+    quote: 'Warm light weaving through open night air.',
+    description: 'Overhead fairy light canopies suspended across outdoor lawns, accompanied by floating candle pools, antique brass lanterns, and warm architectural uplighting.',
+    categoryKey: 'spatial',
+    focalPoint: 'Illuminated pergola structure spanning dining tables with warm 2700K fairy lights.',
+    anchoring: 'Tensioned aircraft cables anchored to perimeter truss uprights with safety secondary tethers.',
+    paletteNotes: 'Warm candlelight glow, deep twilight olive, warm linen, and antique copper.',
+  },
+];
 
 export const DecorationsPage: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // If navigating to hash anchor, smooth scroll to it
     if (location.hash) {
-      const element = document.getElementById(location.hash.replace('#', ''));
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      const hash = location.hash.replace('#', '');
+      // Map old aliases if needed
+      const aliasMap: Record<string, string> = {
+        wedding: 'ceremonies',
+        birthday: 'milestones',
+        flowers: 'florals',
+        balloons: 'ambient',
+      };
+      const targetId = aliasMap[hash] || hash;
+      const el = document.getElementById(targetId) || document.getElementById(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
       }
     } else {
       window.scrollTo(0, 0);
@@ -21,120 +92,109 @@ export const DecorationsPage: React.FC = () => {
   }, [location]);
 
   return (
-    <div className="section-paper">
+    <main id="main-content" className="section-paper">
       <div className="container">
-        {/* Page Header */}
+        {/* Header */}
         <div className="section-header max-w-3xl mb-12">
-          <span className="section-label">Decoration Themes &amp; Scope</span>
+          <span className="section-label">Spatial Disciplines &amp; Scope</span>
           <h1 className="section-title">
-            Tailored Celebration Backdrops in Kukatpally
+            Architectural Celebration Disciplines
           </h1>
           <p className="section-lead">
-            Every celebration in Hyderabad is unique. We specialize exclusively in four core decoration domains, focusing on stage proportions, balanced colors, and prompt setup.
+            A structured breakdown of our four concept celebration disciplines, detailing spatial proportions, material integrity, and structural anchoring methods.
           </p>
         </div>
 
-        {/* Clear Policy Guardrail Alert */}
-        <div className="p-4 rounded border border-amber-300 bg-amber-50 mb-14 flex items-start gap-3">
-          <ShieldAlert size={20} className="text-amber-700 flex-shrink-0 mt-0.5" />
-          <div className="text-xs md:text-sm text-amber-900 leading-relaxed">
-            <strong>Verified Scope Policy:</strong> We provide decor styling for birthdays, weddings, balloons, and fresh flowers only. We do not provide or broker corporate conferences, catering, DJ sound systems, event photography, destination weddings, or celebrity bookings.
-          </div>
-        </div>
-
-        {/* Four Themes Detailed Sections */}
+        {/* Four Themes Deep Dive */}
         <div className="space-y-16">
-          {REEL_CHAPTERS.map((theme) => {
-            const matchingAssets = ASSETS_MANIFEST.filter((a) => a.category === theme.id);
-            const primaryAsset = matchingAssets[0];
+          {THEME_SPECS.map((spec) => {
+            const matchingAssets = ASSETS_MANIFEST.filter((a) => a.category === spec.categoryKey);
+            const primaryAsset = matchingAssets[0] || ASSETS_MANIFEST[0];
 
             return (
               <section
-                key={theme.id}
-                id={theme.id}
-                className="p-6 md:p-10 rounded border border-neutral-300 bg-[#FFFDF9] scroll-mt-24 shadow-sm"
+                key={spec.id}
+                id={spec.id}
+                className="theme-detail-card scroll-mt-24"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                  {/* Left Column: Scope Details */}
-                  <div className="lg:col-span-7">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="font-serif font-bold text-lg text-coral">
-                        Chapter {theme.index}
-                      </span>
-                      <span className="text-xs uppercase tracking-wider font-semibold opacity-60">
-                        Specialized Decor
-                      </span>
+                <div className="theme-detail-grid">
+                  {/* Left Column: Scope & Aesthetic Specification */}
+                  <div className="theme-detail-copy">
+                    <div className="theme-tag-row">
+                      <span className="theme-chapter-pill">Discipline {spec.index}</span>
+                      <span className="theme-contrast-tag">{spec.subtitle}</span>
                     </div>
 
-                    <h2 className="font-serif text-2xl md:text-4xl font-bold mb-4">
-                      {theme.name}
-                    </h2>
+                    <h2 className="theme-title">{spec.title}</h2>
+                    <p className="theme-headline-quote">&ldquo;{spec.quote}&rdquo;</p>
+                    <p className="theme-desc">{spec.description}</p>
 
-                    <p className="text-base opacity-85 leading-relaxed mb-6">
-                      {theme.scopeLine}
-                    </p>
-
-                    <div className="space-y-3 mb-8">
-                      <div className="flex items-start gap-3 text-sm">
-                        <Check size={18} className="text-leaf flex-shrink-0 mt-0.5" />
-                        <span><strong>Ideal Occasions:</strong> {theme.ticketNote}</span>
-                      </div>
-                      <div className="flex items-start gap-3 text-sm">
-                        <Check size={18} className="text-leaf flex-shrink-0 mt-0.5" />
-                        <span><strong>Venue Versatility:</strong> Sized for apartment halls, gated community clubhouses, terrace areas, and local temple halls in Kukatpally.</span>
-                      </div>
-                      <div className="flex items-start gap-3 text-sm">
-                        <Check size={18} className="text-leaf flex-shrink-0 mt-0.5" />
-                        <span><strong>Fastening Discipline:</strong> Non-damaging ties, weighted bases, and clean venue wall care.</span>
-                      </div>
+                    <div className="theme-spec-box">
+                      <h3 className="spec-box-title">Spatial Specifications:</h3>
+                      <ul className="spec-checklist">
+                        <li className="spec-check-item">
+                          <Check size={16} className="text-leaf flex-shrink-0" />
+                          <span><strong>Focal Staging:</strong> {spec.focalPoint}</span>
+                        </li>
+                        <li className="spec-check-item">
+                          <Check size={16} className="text-leaf flex-shrink-0" />
+                          <span><strong>Structural Anchoring:</strong> {spec.anchoring}</span>
+                        </li>
+                        <li className="spec-check-item">
+                          <Check size={16} className="text-leaf flex-shrink-0" />
+                          <span><strong>Harmonic Palette:</strong> {spec.paletteNotes}</span>
+                        </li>
+                      </ul>
                     </div>
 
-                    {/* Secondary Available Options */}
-                    <div className="mb-8 pt-4 border-t border-neutral-200">
-                      <div className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2 flex items-center gap-1.5">
-                        <Sparkles size={12} className="text-amber-500" />
-                        <span>Featured Setup Variations:</span>
+                    {/* Secondary Visual Variations */}
+                    {matchingAssets.length > 1 && (
+                      <div className="theme-variations-box">
+                        <span className="variations-title">Inspiration Variations:</span>
+                        <div className="variations-list">
+                          {matchingAssets.map((asset) => (
+                            <Link
+                              key={asset.id}
+                              to={`/gallery?filter=${spec.categoryKey}`}
+                              className="variation-chip"
+                            >
+                              <span>{asset.title}</span>
+                              <ArrowUpRight size={12} className="opacity-50" />
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {matchingAssets.map((asset) => (
-                          <Link
-                            key={asset.id}
-                            to={`/gallery?filter=${theme.id}`}
-                            className="text-xs bg-[#FFF8EE] hover:bg-neutral-100 border border-neutral-300 px-3 py-1.5 rounded text-neutral-800 transition-colors inline-flex items-center gap-1"
-                          >
-                            <span>{asset.title}</span>
-                            <ArrowUpRight size={12} className="opacity-50" />
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
+                    )}
 
-                    <div className="flex flex-wrap items-center gap-4">
+                    <div className="theme-action-row">
                       <Link
-                        to={`/contact?category=${theme.id}`}
+                        to={`/contact`}
                         className="btn-primary"
+                        aria-label={`Plan a celebration using ${spec.title}`}
                       >
-                        <span>Inquire {theme.name.split(' ')[0]} Decor</span>
-                        <ArrowUpRight size={16} className="ml-1" />
+                        <Sparkles size={16} />
+                        <span>Plan This Discipline</span>
                       </Link>
 
                       <Link
-                        to={`/gallery?filter=${theme.id}`}
+                        to={`/gallery?filter=${spec.categoryKey}`}
                         className="btn-secondary"
+                        aria-label={`View lookbook plates for ${spec.title}`}
                       >
-                        View All {matchingAssets.length} Designs
+                        <span>View Lookbook Plates</span>
+                        <ArrowUpRight size={14} />
                       </Link>
                     </div>
                   </div>
 
-                  {/* Right Column: Visual Concept Plate */}
-                  <div className="lg:col-span-5">
-                    <div className="rounded border border-neutral-300 overflow-hidden shadow-md bg-neutral-900">
-                      <DecorArtwork asset={primaryAsset} themeId={theme.id} variant="full" />
+                  {/* Right Column: Visual Showcase Frame */}
+                  <div className="theme-detail-media">
+                    <div className="theme-photo-frame">
+                      <DecorArtwork asset={primaryAsset} variant="full" />
                     </div>
-                    <div className="text-[11px] opacity-70 mt-2 text-center">
-                      *Featured portfolio styling for {theme.name} in Kukatpally and nearby Hyderabad party halls.
-                    </div>
+                    <p className="theme-photo-caption">
+                      {primaryAsset.caption} &bull; Photo by {primaryAsset.photographer}
+                    </p>
                   </div>
                 </div>
               </section>
@@ -142,6 +202,8 @@ export const DecorationsPage: React.FC = () => {
           })}
         </div>
       </div>
-    </div>
+    </main>
   );
 };
+
+export default DecorationsPage;

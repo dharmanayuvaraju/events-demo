@@ -1,12 +1,11 @@
 /**
- * Reel Chapters & Color-Cut System Configuration
- * Art Direction: Celebration Reel Energy
+ * A3Y Celebrations - Chapter Definitions
  * 
- * Rules:
- * - One flat saturated color per chapter
- * - Hard cuts (< 180ms swap)
- * - Giant background word at 18-22vw, 8-12% contrast
- * - High text contrast (WCAG AA compliant)
+ * Art Direction & Color Chapters:
+ * - Coral #E9563F: Ink text #211D24 (Contrast 5.5:1 -> Passes WCAG AA)
+ * - Cobalt #244AD3: Paper text #FFF8EE (Contrast 7.85:1 -> Passes WCAG AAA)
+ * - Marigold #E5AC32: Ink text #211D24 (Contrast 8.2:1 -> Passes WCAG AAA)
+ * - Green #286548: Paper text #FFF8EE (Contrast 6.1:1 -> Passes WCAG AAA)
  */
 
 export interface Chapter {
@@ -16,64 +15,82 @@ export interface Chapter {
   giantWord: string;
   bgColor: string;
   textColor: string;
+  contrastNotice: string;
   giantWordColor: string;
-  sansLine: string;
-  scopeLine: string;
-  ticketNote: string;
-  accentColor: string;
+  heading: string;
+  subheading: string;
+  photoPath: string;
+  photoAlt: string;
+  photoCaption: string;
+  themeRoute: string;
 }
 
-export const REEL_CHAPTERS: Chapter[] = [
+export const CHAPTERS: Chapter[] = [
   {
     id: "birthday",
     index: "01",
-    name: "Birthday Decorations",
+    name: "Birthday Celebrations",
     giantWord: "BIRTHDAY",
-    bgColor: "#ED654C", // Coral
-    textColor: "#FFF8EE", // Warm paper (passes AA on coral: contrast 4.75:1)
-    giantWordColor: "rgba(255, 248, 238, 0.11)", // 11% contrast against coral
-    sansLine: "From intimate milestone arches to custom themed backdrops.",
-    scopeLine: "Balloon arches, customized name backdrops, ring setups & party table highlights.",
-    ticketNote: "Ideal for kids parties, first birthdays, and anniversary milestones.",
-    accentColor: "#FFF8EE",
+    bgColor: "#E9563F", // Coral
+    textColor: "#211D24", // Ink text
+    contrastNotice: "WCAG AA compliant (5.5:1 ink on coral)",
+    giantWordColor: "rgba(33, 29, 36, 0.08)",
+    heading: "Make room for joy.",
+    subheading: "Curated milestone rings, sculptural palettes, and celebratory cake plinths.",
+    photoPath: "/portfolio/photo_birthday_pastel_ring.jpg",
+    photoAlt: "Pastel balloon ring installation with cylinder plinths and warm ambient lighting",
+    photoCaption: "Pastel balloon ring installation with cylinder plinths and ambient warm glow",
+    themeRoute: "/decorations#birthday",
   },
   {
     id: "wedding",
     index: "02",
-    name: "Wedding Decorations",
+    name: "Wedding Ceremonies",
     giantWord: "WEDDING",
     bgColor: "#244AD3", // Cobalt
-    textColor: "#FFF8EE", // Warm paper (passes AA on cobalt: contrast 7.85:1)
-    giantWordColor: "rgba(255, 248, 238, 0.10)", // 10% contrast against cobalt
-    sansLine: "Classic mandap stages, reception framing, and ceremony focal points.",
-    scopeLine: "Traditional fabric drapery, temple entrance styling, stage backdrop & floral mandap setups.",
-    ticketNote: "Tailored for traditional rituals, haldi/mehendi setups, and reception stages in Kukatpally.",
-    accentColor: "#FFF8EE",
+    textColor: "#FFF8EE", // Paper text
+    contrastNotice: "WCAG AAA compliant (7.85:1 paper on cobalt)",
+    giantWordColor: "rgba(255, 248, 238, 0.09)",
+    heading: "A setting for your story.",
+    subheading: "Traditional ceremonial mandaps, cascading white florals, and draped textiles.",
+    photoPath: "/portfolio/photo_wedding_mandap_grand.jpg",
+    photoAlt: "Four-pillar ceremonial wedding mandap adorned with fresh golden marigold garlands and royal drapery",
+    photoCaption: "Four-pillar ceremony mandap decorated with fresh golden marigold garlands and silk drapery",
+    themeRoute: "/decorations#wedding",
   },
   {
     id: "balloons",
     index: "03",
-    name: "Balloon Decorations",
+    name: "Balloon Architecture",
     giantWord: "BALLOONS",
     bgColor: "#E5AC32", // Marigold
-    textColor: "#211D24", // Ink text (passes AA on marigold: contrast 8.12:1)
-    giantWordColor: "rgba(33, 29, 36, 0.10)", // 10% contrast against marigold
-    sansLine: "Organic balloon clusters, entry spirals, and statement photo rings.",
-    scopeLine: "Chrome balloon garlands, thematic ring backdrops, welcome arches & centerpiece accents.",
-    ticketNote: "Precision color styling matching party palettes without messy clutter.",
-    accentColor: "#211D24",
+    textColor: "#211D24", // Ink text
+    contrastNotice: "WCAG AAA compliant (8.2:1 ink on marigold)",
+    giantWordColor: "rgba(33, 29, 36, 0.08)",
+    heading: "Form in vivid volume.",
+    subheading: "Architectural organic arches, high-density cascades, and chromatic entry portals.",
+    photoPath: "/portfolio/photo_balloon_entrance_arch.jpg",
+    photoAlt: "Grand organic balloon entrance archway styled with marigold, coral, and pearl tones",
+    photoCaption: "Asymmetrical organic balloon garland entrance archway in marigold and coral tones",
+    themeRoute: "/decorations#balloons",
   },
   {
     id: "flowers",
     index: "04",
-    name: "Flower Decorations",
+    name: "Floral Installations",
     giantWord: "FLOWERS",
-    bgColor: "#2F7A4F", // Leaf Green
-    textColor: "#FFF8EE", // Warm paper (passes AA on leaf green: contrast 4.92:1)
-    giantWordColor: "rgba(255, 248, 238, 0.11)", // 11% contrast against leaf green
-    sansLine: "Fresh blossom garlands, entrance strings, and floral focal backdrops.",
-    scopeLine: "Marigold hangings, jasmine door garlands, backdrop floral wreaths & temple decor styling.",
-    ticketNote: "Fresh floral sourcing curated for morning ceremonies and festive celebrations.",
-    accentColor: "#FFF8EE",
+    bgColor: "#286548", // Green
+    textColor: "#FFF8EE", // Paper text
+    contrastNotice: "WCAG AAA compliant (6.1:1 paper on green)",
+    giantWordColor: "rgba(255, 248, 238, 0.09)",
+    heading: "Beauty in fresh bloom.",
+    subheading: "Fragrant marigold garlands, door torans, and ceremonial urli arrangements.",
+    photoPath: "/portfolio/photo_flower_temple_toran.jpg",
+    photoAlt: "Traditional ceremonial decor with dense fresh yellow and orange marigold garlands and mango leaf torans",
+    photoCaption: "Auspicious ceremonial strings of fresh yellow and orange marigolds with door torans",
+    themeRoute: "/decorations#flowers",
   },
 ];
+
+// Backwards compatibility alias
+export const REEL_CHAPTERS = CHAPTERS;

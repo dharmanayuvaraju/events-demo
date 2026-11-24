@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ASSETS_MANIFEST, PortfolioAsset } from '../data/assetsManifest';
 import { DecorArtwork } from '../components/DecorArtwork';
 import { Lightbox } from '../components/Lightbox';
-import { ArrowUpRight, Camera, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Sparkles, Filter } from 'lucide-react';
 
 export const GalleryPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -12,6 +12,7 @@ export const GalleryPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>(filterParam);
   const [selectedAssetIndex, setSelectedAssetIndex] = useState<number | null>(null);
 
+  // Sync state if URL changes
   useEffect(() => {
     if (filterParam) {
       setActiveFilter(filterParam);
@@ -30,7 +31,6 @@ export const GalleryPage: React.FC = () => {
 
   const filteredAssets = useMemo(() => {
     if (activeFilter === 'all') return ASSETS_MANIFEST;
-    if (activeFilter === 'maps') return ASSETS_MANIFEST.filter((item) => item.status === 'verified_maps_photo');
     return ASSETS_MANIFEST.filter((item) => item.category === activeFilter);
   }, [activeFilter]);
 
@@ -55,60 +55,60 @@ export const GalleryPage: React.FC = () => {
   const currentAsset: PortfolioAsset | null =
     selectedAssetIndex !== null ? filteredAssets[selectedAssetIndex] || null : null;
 
-  // Compute category counts
-  const counts = useMemo(() => {
-    return {
-      all: ASSETS_MANIFEST.length,
-      maps: ASSETS_MANIFEST.filter((i) => i.status === 'verified_maps_photo').length,
-      birthday: ASSETS_MANIFEST.filter((i) => i.category === 'birthday').length,
-      wedding: ASSETS_MANIFEST.filter((i) => i.category === 'wedding').length,
-      balloons: ASSETS_MANIFEST.filter((i) => i.category === 'balloons').length,
-      flowers: ASSETS_MANIFEST.filter((i) => i.category === 'flowers').length,
-    };
-  }, []);
+  // Filter categories with real counts
+  const filterOptions = [
+    { id: 'all', label: `All Concepts (${ASSETS_MANIFEST.length})` },
+    { id: 'weddings', label: `Weddings (${ASSETS_MANIFEST.filter((i) => i.category === 'weddings').length})` },
+    { id: 'milestones', label: `Milestones (${ASSETS_MANIFEST.filter((i) => i.category === 'milestones').length})` },
+    { id: 'florals', label: `Florals (${ASSETS_MANIFEST.filter((i) => i.category === 'florals').length})` },
+    { id: 'spatial', label: `Spatial (${ASSETS_MANIFEST.filter((i) => i.category === 'spatial').length})` },
+  ];
 
   return (
-    <div className="section-paper">
+    <main id="main-content" className="section-paper">
       <div className="container">
         {/* Header */}
         <div className="section-header max-w-3xl mb-8">
-          <span className="section-label">Portfolio &amp; Verified Works</span>
-          <h1 className="section-title">Decor Portfolio &amp; Visual Plates</h1>
+          <span className="section-label">Visual Inspiration &amp; Lookbook</span>
+          <h1 className="section-title">Celebration Styling Lookbook</h1>
           <p className="section-lead">
-            Explore our curated celebration staging, combining authentic setup photography from our Kukatpally Google Maps listing with bespoke designs across birthday, wedding, balloon, and flower themes.
+            Curated photographic demonstration plates showcasing spatial staging, floral arrangements, and architectural balloon forms.
           </p>
+
+          <div className="gallery-honesty-banner">
+            <Sparkles size={16} className="text-amber-600 flex-shrink-0" />
+            <p className="banner-text">
+              <strong>Demonstration Standard:</strong> All photography is licensed via Unsplash for editorial concept demonstration. These assets illustrate design palettes and layout architecture; they do not represent commercial work completed by A3Y Solutions.
+            </p>
+          </div>
         </div>
 
-        {/* Category Filters */}
-        <div className="gallery-filters" role="tablist" aria-label="Gallery Category Filters">
-          {[
-            { id: 'all', label: `All Portfolio (${counts.all})` },
-            { id: 'maps', label: `Verified Local (${counts.maps})`, isHighlight: true },
-            { id: 'birthday', label: `Birthday (${counts.birthday})` },
-            { id: 'wedding', label: `Wedding (${counts.wedding})` },
-            { id: 'balloons', label: `Balloons (${counts.balloons})` },
-            { id: 'flowers', label: `Flowers (${counts.flowers})` },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              role="tab"
-              aria-selected={activeFilter === tab.id}
-              className={`filter-btn ${activeFilter === tab.id ? 'active' : ''} ${
-                tab.isHighlight ? 'border-amber-500 font-bold' : ''
-              }`}
-              onClick={() => handleFilterChange(tab.id)}
-            >
-              <span className="flex items-center gap-1.5">
-                {tab.isHighlight ? (
-                  <Camera size={14} className="text-amber-600" />
-                ) : (
-                  <Sparkles size={13} className="opacity-70" />
-                )}
-                <span>{tab.label}</span>
-              </span>
-            </button>
-          ))}
+        {/* Category Filters with Real Buttons and Accessible Result Count */}
+        <div className="gallery-filter-bar">
+          <div className="filter-label-group">
+            <Filter size={15} className="text-neutral-500" />
+            <span className="filter-group-title">Filter by Theme:</span>
+          </div>
+
+          <div className="gallery-filter-buttons" role="tablist" aria-label="Lookbook category filters">
+            {filterOptions.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                role="tab"
+                aria-selected={activeFilter === opt.id}
+                className={`filter-btn ${activeFilter === opt.id ? 'active' : ''}`}
+                onClick={() => handleFilterChange(opt.id)}
+              >
+                <span>{opt.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Screen reader announcement for filter changes */}
+          <div className="sr-only" aria-live="polite">
+            Showing {filteredAssets.length} items for {activeFilter} filter
+          </div>
         </div>
 
         {/* Gallery Grid */}
@@ -116,7 +116,7 @@ export const GalleryPage: React.FC = () => {
           {filteredAssets.map((asset, idx) => (
             <article
               key={asset.id}
-              className="gallery-card group"
+              className="gallery-item-card"
               onClick={() => openLightbox(idx)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -127,40 +127,23 @@ export const GalleryPage: React.FC = () => {
               tabIndex={0}
               role="button"
               aria-haspopup="dialog"
-              aria-label={`Open visual plate details: ${asset.title}`}
+              aria-label={`Open detailed view for ${asset.title}`}
             >
               <div className="gallery-thumb-wrap">
                 <DecorArtwork asset={asset} variant="thumb" />
               </div>
 
               <div className="gallery-card-body">
-                <div className="flex items-center justify-between gap-2">
-                  <span
-                    className={`pending-label ${
-                      asset.status === 'verified_maps_photo'
-                        ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                        : ''
-                    }`}
-                  >
-                    {asset.status === 'verified_maps_photo' ? (
-                      <span className="flex items-center gap-1">
-                        <Camera size={11} className="text-amber-700" />
-                        <span>{asset.statusLabel}</span>
-                      </span>
-                    ) : (
-                      asset.statusLabel
-                    )}
-                  </span>
-                  <span className="text-[11px] uppercase font-bold opacity-50">
-                    {asset.category}
-                  </span>
+                <div className="card-top-row">
+                  <span className="card-category-tag">{asset.categoryLabel}</span>
+                  <span className="card-demo-pill">Inspiration Plate</span>
                 </div>
 
                 <h2 className="gallery-card-title">{asset.title}</h2>
-                <p className="gallery-card-meta">{asset.spec.recommendedVenue}</p>
+                <p className="gallery-card-caption">{asset.caption}</p>
 
-                <div className="mt-2 flex items-center justify-between text-xs font-bold text-coral group-hover:underline">
-                  <span>View Full Details</span>
+                <div className="gallery-card-action">
+                  <span>View Plate Details</span>
                   <ArrowUpRight size={14} />
                 </div>
               </div>
@@ -168,7 +151,7 @@ export const GalleryPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Lightbox Component with Native <dialog> Modal semantics */}
+        {/* Accessible Lightbox Modal */}
         <Lightbox
           asset={currentAsset}
           isOpen={selectedAssetIndex !== null}
@@ -179,6 +162,6 @@ export const GalleryPage: React.FC = () => {
           hasNext={selectedAssetIndex !== null && selectedAssetIndex < filteredAssets.length - 1}
         />
       </div>
-    </div>
+    </main>
   );
 };

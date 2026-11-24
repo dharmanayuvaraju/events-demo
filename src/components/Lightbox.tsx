@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { PortfolioAsset } from '../data/assetsManifest';
-import { DecorArtwork } from './DecorArtwork';
-import { X, ChevronLeft, ChevronRight, MapPin, Camera, ExternalLink } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ExternalLink, Sparkles } from 'lucide-react';
 
 interface LightboxProps {
   asset: PortfolioAsset | null;
@@ -24,21 +23,34 @@ export const Lightbox: React.FC<LightboxProps> = ({
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const triggerElementRef = useRef<HTMLElement | null>(null);
 
-  // Synchronize modal state with native <dialog> showModal()
+  // Store trigger element on open for restoring focus on close
+  useEffect(() => {
+    if (isOpen) {
+      triggerElementRef.current = document.activeElement as HTMLElement;
+    }
+  }, [isOpen]);
+
+  // Synchronize modal state with native <dialog>
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
     if (isOpen && !dialog.open) {
       dialog.showModal();
-      closeBtnRef.current?.focus();
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => {
+        closeBtnRef.current?.focus();
+      }, 50);
     } else if (!isOpen && dialog.open) {
       dialog.close();
+      document.body.style.overflow = '';
+      triggerElementRef.current?.focus();
     }
   }, [isOpen]);
 
-  // Handle native cancel (Esc key) and light dismiss
+  // Keyboard navigation & light dismiss handlers
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
@@ -78,39 +90,26 @@ export const Lightbox: React.FC<LightboxProps> = ({
   return (
     <dialog
       ref={dialogRef}
-      className="lightbox-modal"
+      className="lightbox-dialog photowall-lightbox"
       aria-labelledby="lightbox-title"
+      aria-modal="true"
     >
-      <div className="lightbox-content">
-        {/* Header */}
-        <div className="lightbox-header">
-          <div className="flex items-center gap-3">
-            <span
-              className={`pending-label ${
-                asset.status === 'verified_maps_photo'
-                  ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                  : ''
-              }`}
-            >
-              {asset.status === 'verified_maps_photo' ? (
-                <Camera size={13} className="text-amber-700" />
-              ) : (
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-600 inline-block" />
-              )}
-              {asset.statusLabel}
-            </span>
-            <span className="text-xs uppercase tracking-wider font-semibold opacity-65">
-              {asset.categoryLabel}
-            </span>
+      <div className="lightbox-container">
+        {/* Header Bar */}
+        <div className="lightbox-topbar">
+          <div className="lightbox-badge-group">
+            <span className="lightbox-category-badge">{asset.categoryLabel}</span>
+            <span className="lightbox-inspiration-pill">Visual Inspiration / Demo</span>
           </div>
 
-          <div className="lightbox-nav-btns">
+          <div className="lightbox-nav-controls">
             <button
               type="button"
               className="btn-icon"
               onClick={onPrev}
               disabled={!hasPrev}
-              aria-label="Previous artwork plate"
+              aria-label="Previous image plate"
+              title="Previous image"
               style={{ opacity: hasPrev ? 1 : 0.35 }}
             >
               <ChevronLeft size={20} />
@@ -120,7 +119,8 @@ export const Lightbox: React.FC<LightboxProps> = ({
               className="btn-icon"
               onClick={onNext}
               disabled={!hasNext}
-              aria-label="Next artwork plate"
+              aria-label="Next image plate"
+              title="Next image"
               style={{ opacity: hasNext ? 1 : 0.35 }}
             >
               <ChevronRight size={20} />
@@ -128,74 +128,92 @@ export const Lightbox: React.FC<LightboxProps> = ({
             <button
               ref={closeBtnRef}
               type="button"
-              className="btn-icon"
+              className="btn-icon lightbox-close-btn"
               onClick={onClose}
               aria-label="Close dialog"
+              title="Close (Esc)"
             >
               <X size={20} />
             </button>
           </div>
         </div>
 
-        {/* Body */}
-        <div className="lightbox-body">
-          {/* Framed Graphic / Photo Plate */}
-          <div className="rounded overflow-hidden border border-neutral-300 shadow-sm bg-neutral-900">
-            <DecorArtwork asset={asset} variant="full" />
+        {/* Content Layout */}
+        <div className="lightbox-content-grid">
+          {/* Large Image Frame */}
+          <div className="lightbox-photo-pane">
+            <img
+              src={asset.imagePath}
+              alt={asset.title}
+              width={asset.dimensions.width}
+              height={asset.dimensions.height}
+              className="lightbox-main-img"
+            />
+            <p className="lightbox-photo-caption">
+              {asset.caption}
+            </p>
           </div>
 
-          {/* Details & Specifications */}
-          <div className="flex flex-col justify-between">
+          {/* Details & Provenance Column */}
+          <div className="lightbox-details-pane">
             <div>
-              <h2 id="lightbox-title" className="font-serif text-2xl font-bold mb-3">
+              <h2 id="lightbox-title" className="lightbox-asset-title">
                 {asset.title}
               </h2>
-              <p className="text-sm opacity-85 leading-relaxed mb-4">
+              <p className="lightbox-asset-desc">
                 {asset.description}
               </p>
 
-              <div className="mb-4">
-                <span className="text-xs font-bold uppercase tracking-wider block mb-2 opacity-60">
-                  Decor Elements &amp; Palette:
-                </span>
-                <ul className="text-xs space-y-1.5 opacity-80 list-disc list-inside">
-                  {asset.spec.decorElements.map((item, idx) => (
-                    <li key={idx}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="flex items-start gap-2 text-xs opacity-75 mb-4">
-                <MapPin size={15} className="flex-shrink-0 mt-0.5 text-coral" />
-                <span>Recommended Venue: {asset.spec.recommendedVenue}</span>
-              </div>
-
-              {asset.sourceUrl && (
-                <div className="mb-4 p-2.5 rounded bg-amber-50 border border-amber-200 text-xs">
-                  <a
-                    href={asset.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-amber-900 font-bold hover:underline"
-                  >
-                    <span>View original on Google Maps Profile</span>
-                    <ExternalLink size={13} />
-                  </a>
+              {/* Specification Attributes */}
+              <div className="lightbox-spec-group">
+                <h3 className="spec-heading">Spatial &amp; Palette Spec</h3>
+                
+                <div className="spec-item">
+                  <span className="spec-label">Venue Type:</span>
+                  <span className="spec-val">{asset.spec.venue}</span>
                 </div>
-              )}
+
+                <div className="spec-item">
+                  <span className="spec-label">Key Elements:</span>
+                  <span className="spec-val">{asset.spec.elements.join(', ')}</span>
+                </div>
+
+                <div className="spec-item">
+                  <span className="spec-label">Palette Swatches:</span>
+                  <div className="swatch-list">
+                    {asset.spec.palette.map((color, i) => (
+                      <span
+                        key={i}
+                        className="color-swatch-dot"
+                        style={{ backgroundColor: color }}
+                        title={color}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="pt-4 border-t border-neutral-200">
-              <div className="text-[11px] opacity-60 leading-normal mb-3">
-                <strong>Provenance:</strong> {asset.provenance}. {asset.legalNotice}.
+            {/* Provenance & License Notice */}
+            <div className="lightbox-provenance-box">
+              <div className="provenance-title flex items-center gap-1.5">
+                <Sparkles size={13} className="text-amber-600" />
+                <span>Asset Provenance &amp; Attribution</span>
               </div>
-
-              <a
-                href={`/contact?category=${asset.category}&title=${encodeURIComponent(asset.title)}`}
-                className="btn-primary w-full text-center"
-              >
-                Inquire about this style
-              </a>
+              <p className="provenance-note">
+                Photo by <strong>{asset.photographer}</strong> via{' '}
+                <a
+                  href={asset.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="provenance-link"
+                >
+                  Unsplash <ExternalLink size={11} className="inline ml-0.5" />
+                </a>.
+              </p>
+              <p className="provenance-license">
+                {asset.license}. Displayed for design demonstration and layout testing. Not work completed by A3Y Solutions.
+              </p>
             </div>
           </div>
         </div>

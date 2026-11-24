@@ -1,322 +1,309 @@
 /**
- * Asset Manifest and Source Metadata
+ * A3Y Celebrations - Asset Manifest & Provenance Registry
  * 
- * Curated high-resolution celebration decor portfolio for Colors Events & Entertainment
- * (Kukatpally, Hyderabad), combining authentic local venue setups and high-definition
- * celebration design references across the four core themes:
- * - Birthday Decorations
- * - Wedding Decorations
- * - Balloon Decorations
- * - Flower Decorations
+ * Curated high-resolution celebration decor imagery illustrating wedding ceremonies,
+ * floral installations, milestone staging, and spatial architecture.
+ * 
+ * DISCLAIMER & HONESTY NOTICE:
+ * All imagery is licensed via Unsplash for editorial concept demonstration.
+ * These assets illustrate design palettes and spatial layout; they do NOT
+ * represent commercial work completed by A3Y Solutions.
  */
 
 export interface PortfolioAsset {
   id: string;
   title: string;
-  category: 'birthday' | 'wedding' | 'balloons' | 'flowers';
+  category: 'weddings' | 'milestones' | 'florals' | 'spatial';
   categoryLabel: string;
-  status: 'verified_maps_photo' | 'curated_portfolio_photo';
-  statusLabel: string;
-  badgeLabel: string;
   imagePath: string;
-  sourceUrl?: string;
-  provenance: string;
-  legalNotice: string;
+  photographer: string;
+  sourceUrl: string;
+  license: string;
   dimensions: {
     width: number;
     height: number;
     aspectRatio: string;
   };
+  caption: string;
   description: string;
   spec: {
     palette: string[];
-    decorElements: string[];
-    recommendedVenue: string;
+    elements: string[];
+    venue: string;
   };
 }
 
-export const ASSETS_MANIFEST: PortfolioAsset[] = [
-  // =========================================================================
-  // CHAPTER 01: BIRTHDAY DECORATIONS
-  // =========================================================================
-  {
-    id: "decor-bday-pastel-ring",
-    title: "Pastel Balloon Ring & Cake Plinth Staging",
-    category: "birthday",
-    categoryLabel: "Milestone Birthday",
-    status: "curated_portfolio_photo",
-    statusLabel: "Featured Staging",
-    badgeLabel: "Milestone Styling",
-    imagePath: "/portfolio/photo_birthday_pastel_ring.jpg",
-    provenance: "High-resolution celebration photography illustrating modern pastel ring arches, multi-tier balloon clusters, and cake plinth pedestals.",
-    legalNotice: "High-definition celebration decor showcase matching Kukatpally apartment clubhouses and birthday party halls.",
-    dimensions: { width: 1600, height: 1067, aspectRatio: "3/2" },
-    description: "Modern organic balloon ring setup featuring soft coral, blush, ivory, and champagne chrome accents, paired with cylindrical cake plinths and warm ambient backlighting.",
-    spec: {
-      palette: ["#ED654C", "#FFF8EE", "#E5AC32", "#FFFFFF"],
-      decorElements: ["Round Metallic Frame", "Multi-Size Organic Balloon Garland", "Acrylic Cake Pedestals", "Warm LED Sign Glow"],
-      recommendedVenue: "Clubhouse / Party Hall, Kukatpally",
-    },
-  },
-  {
-    id: "decor-bday-safari-stage",
-    title: "1st Birthday Safari Stage with 3D Animal Props",
-    category: "birthday",
-    categoryLabel: "Milestone Birthday",
-    status: "verified_maps_photo",
-    statusLabel: "Verified Kukatpally Setup",
-    badgeLabel: "Kukatpally Venue Setup",
-    imagePath: "/portfolio/maps_photo_stage_2.jpg",
-    sourceUrl: "https://www.google.com/maps/place/Colors+Events+%26+Entertainment/@17.5034253,78.4039148,3a,75y/data=!3m8!1e2!3m6!1sCIABIhCjjwr3E528bMKygOHeh2qL!2e10!3e12!6shttps:%2F%2Flh3.googleusercontent.com%2Fgps-cs-s%2FANWiy9QcorFGxEnx7KhqDtlYpuk3LEhYood0gcuorGriOGsqQf4L0sh_3icp2dvsNS3ieyi_69HvyjC7he7u8w49hoxsEVyJCiYaUEWz9tGV-56v6nqMjcHxczs_8vA5nxzN7AHtmLDAhNWhqT98%3Dw657-h298-k-no!7i1600!8i725!4m9!3m8!1s0x3bcb9163e430fd79:0x4611ced020726bcf!8m2!3d17.5034253!4d78.4039148!10e5!14m1!1BCgIgAQ!16s%2Fg%2F11l6yr5f2c",
-    provenance: "Authentic Google Maps Listing Photography from Colors Events & Entertainment, Kukatpally.",
-    legalNotice: "Verified business installation showcasing jungle safari 1st birthday milestone stage execution in Kukatpally.",
-    dimensions: { width: 1600, height: 725, aspectRatio: "16/7" },
-    description: "Grand 1st birthday safari celebration stage featuring 3D life-sized animal props (Giraffe, Elephant, Zebra, Lion), illuminated marquee letters, multi-color balloon garland borders, and ceiling swags.",
-    spec: {
-      palette: ["#ED654C", "#E5AC32", "#2F7A4F", "#FFF8EE"],
-      decorElements: ["3D Safari Animal Cutouts", "Illuminated Marquee Letters", "Multi-Tier Balloon Stage Border", "Fabric Swag Ceiling"],
-      recommendedVenue: "Banquet Hall, Kukatpally / Shamshiguda",
-    },
-  },
-  {
-    id: "decor-bday-cradle-ring",
-    title: "Personalized Milestone Ring & Balloon Halo",
-    category: "birthday",
-    categoryLabel: "Milestone Birthday",
-    status: "curated_portfolio_photo",
-    statusLabel: "Featured Staging",
-    badgeLabel: "Milestone Styling",
-    imagePath: "/portfolio/photo_baby_cradle_decor.jpg",
-    provenance: "High-resolution celebration photography illustrating floral balloon rings for cradle ceremonies and milestone celebrations.",
-    legalNotice: "High-definition decor showcase matching intimate apartment ceremonies.",
-    dimensions: { width: 1600, height: 1067, aspectRatio: "3/2" },
-    description: "Intimate celebration ring decorated with organic pastel balloon groupings, delicate faux blossom accents, and customizable family name backdrop disc.",
-    spec: {
-      palette: ["#FFF8EE", "#ED654C", "#E5AC32"],
-      decorElements: ["Circular Arch Structure", "Double-Stuffed Pastel Balloons", "Botanical Floral Accents", "Name Plaque Disc"],
-      recommendedVenue: "Home Living Room / Terrace, Tulasi Nagar",
-    },
-  },
-  {
-    id: "decor-bday-kids-party",
-    title: "Vibrant Thematic Birthday Arch & Props",
-    category: "birthday",
-    categoryLabel: "Kids Birthday",
-    status: "curated_portfolio_photo",
-    statusLabel: "Featured Staging",
-    badgeLabel: "Thematic Staging",
-    imagePath: "/portfolio/photo_kids_birthday.jpg",
-    provenance: "High-resolution celebration photography showing energetic multi-tone party styling.",
-    legalNotice: "High-definition celebration reference photography.",
-    dimensions: { width: 1200, height: 800, aspectRatio: "3/2" },
-    description: "High-energy kids birthday celebration setup featuring multi-colored balloon arches, celebratory bunting, and themed photo focal stations.",
-    spec: {
-      palette: ["#ED654C", "#E5AC32", "#2F7A4F", "#244AD3"],
-      decorElements: ["Multi-tone Balloon Clusters", "Festive Floor Bunting", "Number Milestone Box", "Entrance Arch"],
-      recommendedVenue: "Gated Community Clubhouse, Kukatpally",
-    },
-  },
+export interface AccordionItem {
+  id: string;
+  index: string;
+  category: string;
+  title: string;
+  shortDesc: string;
+  imagePath: string;
+  photographer: string;
+  desktopHeight: number;
+  route: string;
+}
 
-  // =========================================================================
-  // CHAPTER 02: WEDDING DECORATIONS
-  // =========================================================================
+export const ACCORDION_ITEMS: AccordionItem[] = [
   {
-    id: "decor-wed-grand-mandap",
-    title: "Grand Indian Wedding Stage & Traditional Floral Mandap",
-    category: "wedding",
-    categoryLabel: "Wedding Ceremony",
-    status: "curated_portfolio_photo",
-    statusLabel: "Featured Staging",
-    badgeLabel: "Grand Ceremony Mandap",
+    id: "acc-mandap",
+    index: "01",
+    category: "Weddings",
+    title: "Traditional Ceremony Mandap",
+    shortDesc: "Four-pillar sacred canopy with fresh golden marigold latkans and royal silk drapery.",
     imagePath: "/portfolio/photo_wedding_mandap_grand.jpg",
-    provenance: "High-resolution celebration photography featuring grand traditional Indian wedding stage styling with authentic marigold flowers and ceremonial mandap.",
-    legalNotice: "High-definition traditional wedding decor showcase matching marriage halls across Kukatpally and Hyderabad.",
+    photographer: "Alok Sharma",
+    desktopHeight: 540,
+    route: "/decorations#weddings",
+  },
+  {
+    id: "acc-milestone",
+    index: "02",
+    category: "Milestones",
+    title: "Pastel Ring & Plinth Staging",
+    shortDesc: "Sculptural circular arch with organic balloon clusters and ambient cylinder plinths.",
+    imagePath: "/portfolio/photo_birthday_pastel_ring.jpg",
+    photographer: "Adi Goldstein",
+    desktopHeight: 500,
+    route: "/decorations#milestones",
+  },
+  {
+    id: "acc-canopy",
+    index: "03",
+    category: "Weddings",
+    title: "Cascading Blossom Canopy",
+    shortDesc: "Dense white floral swags suspended over ceremonial seating with warm candlelight glow.",
+    imagePath: "/portfolio/photo_floral_mandap_canopy.jpg",
+    photographer: "Tom Pumford",
+    desktopHeight: 530,
+    route: "/decorations#weddings",
+  },
+  {
+    id: "acc-arch",
+    index: "04",
+    category: "Spatial",
+    title: "Organic Entrance Portal",
+    shortDesc: "Asymmetrical balloon archway in champagne, coral, and pearl tones for arrival framing.",
+    imagePath: "/portfolio/photo_balloon_entrance_arch.jpg",
+    photographer: "Rohan Makhecha",
+    desktopHeight: 490,
+    route: "/decorations#spatial",
+  },
+  {
+    id: "acc-toran",
+    index: "05",
+    category: "Florals",
+    title: "Temple Toran & Urli Staging",
+    shortDesc: "Auspicious yellow and orange marigold garlands paired with brass urli floating petals.",
+    imagePath: "/portfolio/photo_flower_temple_toran.jpg",
+    photographer: "Siddhesh Mangore",
+    desktopHeight: 520,
+    route: "/decorations#florals",
+  },
+  {
+    id: "acc-haldi",
+    index: "06",
+    category: "Florals",
+    title: "Haldi Ceremonial Pavilion",
+    shortDesc: "Vibrant yellow fabric canopy styled with marigold latkans and traditional ceremonial dais.",
+    imagePath: "/portfolio/photo_haldi_ceremony.jpg",
+    photographer: "Karan Somani",
+    desktopHeight: 510,
+    route: "/decorations#florals",
+  },
+  {
+    id: "acc-reception",
+    index: "07",
+    category: "Spatial",
+    title: "Evening Banquet Stage",
+    shortDesc: "Illuminated floral backdrop arches with pleated velvet curtains and warm stage floodlights.",
+    imagePath: "/portfolio/photo_reception_stage_evening.jpg",
+    photographer: "Sandy Millar",
+    desktopHeight: 535,
+    route: "/decorations#spatial",
+  },
+];
+
+export const ASSETS_MANIFEST: PortfolioAsset[] = [
+  {
+    id: "asset-wed-grand-mandap",
+    title: "Traditional Ceremony Mandap & Silk Swags",
+    category: "weddings",
+    categoryLabel: "Wedding Ceremonies",
+    imagePath: "/portfolio/photo_wedding_mandap_grand.jpg",
+    photographer: "Alok Sharma",
+    sourceUrl: "https://unsplash.com/photos/730e3918a45a",
+    license: "Unsplash License (Free commercial & personal use)",
     dimensions: { width: 1600, height: 1067, aspectRatio: "3/2" },
-    description: "Spectacular traditional Indian wedding mandap adorned with fresh golden marigold and jasmine garlands, rich royal silk fabric drapery, brass ceremonial lamps, and regal bride & groom seating.",
+    caption: "Four-pillar ceremony mandap decorated with fresh golden marigold garlands and royal drapery",
+    description: "Traditional Indian wedding mandap adorned with fresh golden marigold and jasmine garlands, rich royal silk fabric drapery, brass ceremonial lamps, and regal seating.",
     spec: {
-      palette: ["#244AD3", "#E5AC32", "#FFF8EE", "#ED654C"],
-      decorElements: ["Four-Pillar Mandap Structure", "Fresh Marigold & Jasmine Hangings", "Silk Backdrop Drapery", "Brass Diya & Urli Staging"],
-      recommendedVenue: "Convention Center / Kalyana Mandapam, Kukatpally",
+      palette: ["#1F2921", "#C29B68", "#FAF7F2", "#E9563F"],
+      elements: ["Four-Pillar Mandap Structure", "Fresh Marigold & Jasmine Hangings", "Silk Drapery", "Brass Diya Staging"],
+      venue: "Convention Center / Kalyana Mandapam",
     },
   },
   {
-    id: "decor-wed-floral-canopy",
-    title: "Ceremony Mandap Canopy with Cascading White & Gold Florals",
-    category: "wedding",
-    categoryLabel: "Wedding Ceremony",
-    status: "curated_portfolio_photo",
-    statusLabel: "Featured Staging",
-    badgeLabel: "Cascading Mandap",
+    id: "asset-wed-aisle",
+    title: "Scenic Ceremony Aisle & Floral Arches",
+    category: "weddings",
+    categoryLabel: "Wedding Ceremonies",
+    imagePath: "/portfolio/photo_scenic_aisle_ceremony.jpg",
+    photographer: "Sandy Millar",
+    sourceUrl: "https://unsplash.com/photos/611481863552",
+    license: "Unsplash License (Free commercial & personal use)",
+    dimensions: { width: 1800, height: 1200, aspectRatio: "3/2" },
+    caption: "Ceremonial aisle lined with delicate blossom clusters and warm ambient pillar lights",
+    description: "Open-air wedding ceremony aisle framed with natural timber arches, cascading ivory floral arrangements, and warm lantern lighting.",
+    spec: {
+      palette: ["#FAF7F2", "#2E3D31", "#C29B68"],
+      elements: ["Timber Aisle Pillars", "Ivory Rose & Hydrangea Clusters", "Linen Runner", "Warm Ambient Lanterns"],
+      venue: "Garden Courtyard / Estate Lawn",
+    },
+  },
+  {
+    id: "asset-wed-canopy",
+    title: "Cascading Blossom Ceremony Canopy",
+    category: "weddings",
+    categoryLabel: "Wedding Ceremonies",
     imagePath: "/portfolio/photo_floral_mandap_canopy.jpg",
-    provenance: "High-resolution wedding photography showing ceremonial mandap pillars and cascading floral canopy.",
-    legalNotice: "High-definition wedding decor reference photography matching traditional rituals.",
+    photographer: "Tom Pumford",
+    sourceUrl: "https://unsplash.com/photos/715cb0215aed",
+    license: "Unsplash License (Free commercial & personal use)",
     dimensions: { width: 1600, height: 1067, aspectRatio: "3/2" },
+    caption: "Pillar framework with dense cascading white blossoms and warm amber ambient ceremony illumination",
     description: "Four-pillar ceremony mandap decorated with dense white blossom cascades, golden fabric swags, and welcoming entrance aisle walkway.",
     spec: {
-      palette: ["#244AD3", "#FFF8EE", "#E5AC32"],
-      decorElements: ["Mandap Pillar Framework", "Cascading Floral Garlands", "Ceremonial Seating Dais", "Aisle Walkway Pillars"],
-      recommendedVenue: "Community Hall / Temple Premises, Kukatpally",
+      palette: ["#1F2921", "#FAF7F2", "#C29B68"],
+      elements: ["Mandap Pillar Framework", "Cascading Floral Garlands", "Ceremonial Seating Dais", "Aisle Walkway Pillars"],
+      venue: "Community Hall / Temple Premises",
     },
   },
   {
-    id: "decor-wed-reception-stage",
-    title: "Evening Reception Stage with Floral Arch & Warm Lighting",
-    category: "wedding",
-    categoryLabel: "Reception Staging",
-    status: "curated_portfolio_photo",
-    statusLabel: "Featured Staging",
-    badgeLabel: "Reception Staging",
-    imagePath: "/portfolio/photo_reception_stage_evening.jpg",
-    provenance: "High-resolution stage photography showing evening reception stage lighting and floral backdrop arches.",
-    legalNotice: "High-definition evening decor reference photography matching local banquet halls.",
+    id: "asset-milestone-pastel",
+    title: "Pastel Balloon Ring & Cake Plinth Staging",
+    category: "milestones",
+    categoryLabel: "Milestone Celebrations",
+    imagePath: "/portfolio/photo_birthday_pastel_ring.jpg",
+    photographer: "Adi Goldstein",
+    sourceUrl: "https://unsplash.com/photos/de8c9debad1d",
+    license: "Unsplash License (Free commercial & personal use)",
     dimensions: { width: 1600, height: 1067, aspectRatio: "3/2" },
-    description: "Warm ambient reception stage with pleated fabric backdrop, grand floral archway, couple stage sofa, and warm floodlighting.",
+    caption: "Pastel balloon ring installation with cylinder plinths and ambient warm glow",
+    description: "Modern circular ring arch with organic pastel balloon clusters, cylindrical cake pedestals, and warm ambient backlighting.",
     spec: {
-      palette: ["#244AD3", "#E5AC32", "#FFF8EE"],
-      decorElements: ["Warm Stage Floodlights", "Pleated Velvet Drapery", "Floral Side Pedestals", "Couple Stage Chairs"],
-      recommendedVenue: "Party Hall / Reception Venue, Kukatpally",
+      palette: ["#FAF7F2", "#E9563F", "#C29B68", "#1F2921"],
+      elements: ["Round Metallic Frame", "Multi-Size Organic Balloon Garland", "Acrylic Cake Pedestals", "Warm LED Sign Glow"],
+      venue: "Clubhouse / Private Hall",
     },
   },
   {
-    id: "decor-wed-maps-stage",
-    title: "Panoramic Celebration Dais & Backdrop",
-    category: "wedding",
-    categoryLabel: "Stage & Ceremony",
-    status: "verified_maps_photo",
-    statusLabel: "Verified Kukatpally Setup",
-    badgeLabel: "Kukatpally Venue Setup",
-    imagePath: "/portfolio/maps_photo_1.jpg",
-    sourceUrl: "https://www.google.com/maps/place/Colors+Events+%26+Entertainment/@17.5034253,78.4039148,3a,75y/data=!3m8!1e2!3m6!1sCIABIhCjjwr3E528bMKygOHeh2qL!2e10!3e12!6shttps:%2F%2Flh3.googleusercontent.com%2Fgps-cs-s%2FANWiy9QcorFGxEnx7KhqDtlYpuk3LEhYood0gcuorGriOGsqQf4L0sh_3icp2dvsNS3ieyi_69HvyjC7he7u8w49hoxsEVyJCiYaUEWz9tGV-56v6nqMjcHxczs_8vA5nxzN7AHtmLDAhNWhqT98%3Dw657-h298-k-no!7i1600!8i725!4m9!3m8!1s0x3bcb9163e430fd79:0x4611ced020726bcf!8m2!3d17.5034253!4d78.4039148!10e5!14m1!1BCgIgAQ!16s%2Fg%2F11l6yr5f2c",
-    provenance: "Authentic Google Maps Listing Photography from Colors Events & Entertainment, Kukatpally.",
-    legalNotice: "Claimed business photography uploaded to official Google Maps listing.",
-    dimensions: { width: 1200, height: 544, aspectRatio: "16/7" },
-    description: "Wide panoramic view of high-impact celebration stage decoration with saturated color coordination, thematic props, and ceremonial entrance styling.",
-    spec: {
-      palette: ["#244AD3", "#E5AC32", "#ED654C", "#FFF8EE"],
-      decorElements: ["Wide Stage Drape Waves", "Curated Arch Elements", "Ceremonial Dais Framing", "Accent Lighting"],
-      recommendedVenue: "Community Hall, Mahankali Nagar / Kukatpally",
-    },
-  },
-
-  // =========================================================================
-  // CHAPTER 03: BALLOON DECORATIONS
-  // =========================================================================
-  {
-    id: "decor-balloon-entrance-arch",
-    title: "Grand Entrance Organic Balloon Garland Archway",
-    category: "balloons",
-    categoryLabel: "Balloon Styling",
-    status: "curated_portfolio_photo",
-    statusLabel: "Featured Staging",
-    badgeLabel: "Organic Balloon Arch",
-    imagePath: "/portfolio/photo_balloon_entrance_arch.jpg",
-    provenance: "High-resolution celebration photography showing high-density organic balloon garland installations for entrances and celebratory stages.",
-    legalNotice: "High-definition balloon installation showcase matching Hyderabad party venues.",
+    id: "asset-milestone-cradle",
+    title: "Milestone Celebration Ring with Floral Halo",
+    category: "milestones",
+    categoryLabel: "Milestone Celebrations",
+    imagePath: "/portfolio/photo_baby_cradle_decor.jpg",
+    photographer: "Klara Kulikova",
+    sourceUrl: "https://unsplash.com/photos/2782549b5136",
+    license: "Unsplash License (Free commercial & personal use)",
     dimensions: { width: 1600, height: 1067, aspectRatio: "3/2" },
-    description: "Statement party entryway arch constructed with multi-sized organic balloon clusters in golden marigold, coral, and pearl tones, anchored with non-marking weighted bases.",
+    caption: "Delicate round arch adorned with double-stuffed pastel balloons and faux floral botanicals",
+    description: "Intimate celebration ring decorated with organic pastel balloon groupings, delicate botanical accents, and customizable backdrop disc.",
     spec: {
-      palette: ["#E5AC32", "#ED654C", "#FFF8EE", "#211D24"],
-      decorElements: ["High-Density Organic Arch", "Chrome & Matte Color Mixing", "Free-Standing Framework", "Entrance Focal Styling"],
-      recommendedVenue: "Banquet Foyer / Home Entrance, Kukatpally",
+      palette: ["#FAF7F2", "#E9563F", "#C29B68"],
+      elements: ["Circular Arch Structure", "Double-Stuffed Pastel Balloons", "Botanical Floral Accents", "Name Plaque Disc"],
+      venue: "Private Residence / Terrace",
     },
   },
   {
-    id: "decor-balloon-garland-cascade",
-    title: "High-Density Organic Balloon Cascade",
-    category: "balloons",
-    categoryLabel: "Balloon Styling",
-    status: "curated_portfolio_photo",
-    statusLabel: "Featured Staging",
-    badgeLabel: "Balloon Architecture",
-    imagePath: "/portfolio/photo_balloon_garland.jpg",
-    provenance: "High-resolution celebration photography showing organic balloon cascades.",
-    legalNotice: "High-definition celebration reference photography.",
-    dimensions: { width: 1200, height: 800, aspectRatio: "3/2" },
-    description: "Volumetric balloon cascade designed for backdrop framing, cake plinth side cascades, and photo booth staging.",
-    spec: {
-      palette: ["#E5AC32", "#ED654C", "#211D24"],
-      decorElements: ["Double-Layer Balloon Garland", "Matte & Chrome Accents", "Rigid Arch Base", "Non-Damaging Ties"],
-      recommendedVenue: "Home Entrance / Banquet Foyer, Mahankali Nagar",
-    },
-  },
-  {
-    id: "decor-balloon-entrance-portal",
-    title: "Celebration Venue Entrance Balloon Portal",
-    category: "balloons",
-    categoryLabel: "Balloon Styling",
-    status: "verified_maps_photo",
-    statusLabel: "Verified Kukatpally Setup",
-    badgeLabel: "Kukatpally Venue Setup",
-    imagePath: "/portfolio/maps_balloon_entrance.jpg",
-    provenance: "Colors Events & Entertainment venue setup records, Kukatpally.",
-    legalNotice: "Verified business installation showcasing venue entrance framing.",
-    dimensions: { width: 1200, height: 800, aspectRatio: "3/2" },
-    description: "Spiraling party entrance balloon portal guiding guests from hall entrance to main ceremonial stage.",
-    spec: {
-      palette: ["#E5AC32", "#ED654C", "#244AD3"],
-      decorElements: ["Spiral Balloon Columns", "Connecting Overhead Arch", "Welcome Display Pedestal", "Floor Spotlights"],
-      recommendedVenue: "Party Hall Entry, Kukatpally",
-    },
-  },
-
-  // =========================================================================
-  // CHAPTER 04: FLOWER DECORATIONS
-  // =========================================================================
-  {
-    id: "decor-flower-temple-toran",
-    title: "Traditional Fresh Marigold Strings & Auspicious Floral Decor",
-    category: "flowers",
-    categoryLabel: "Fresh Floral Styling",
-    status: "curated_portfolio_photo",
-    statusLabel: "Featured Staging",
-    badgeLabel: "Auspicious Fresh Florals",
+    id: "asset-florals-toran",
+    title: "Auspicious Fresh Marigold Strings & Torans",
+    category: "florals",
+    categoryLabel: "Floral Architecture",
     imagePath: "/portfolio/photo_flower_temple_toran.jpg",
-    provenance: "High-resolution floral photography showing auspicious fresh marigolds, jasmine door garlands, and temple styling.",
-    legalNotice: "High-definition floral decor showcase matching traditional rituals and ceremonies in Kukatpally.",
+    photographer: "Siddhesh Mangore",
+    sourceUrl: "https://unsplash.com/photos/69a00dbfde81",
+    license: "Unsplash License (Free commercial & personal use)",
     dimensions: { width: 1600, height: 1067, aspectRatio: "3/2" },
-    description: "Auspicious traditional ceremonial decoration featuring dense strings of fresh yellow and orange marigolds, fragrant jasmine latkans, green mango leaf door torans, and brass urli flower floating arrangements.",
+    caption: "Auspicious ceremonial strings of fresh yellow and orange marigolds with door torans",
+    description: "Traditional festive decor featuring dense strings of fresh yellow and orange marigolds, fragrant jasmine latkans, green mango leaf door torans, and brass urli flower floating arrangements.",
     spec: {
-      palette: ["#2F7A4F", "#E5AC32", "#FFF8EE", "#ED654C"],
-      decorElements: ["Fresh Marigold Latkans", "Mango Leaf Door Toran", "Brass Urli Floral Displays", "Ceremonial Stage Garlands"],
-      recommendedVenue: "Ramalayam Temple vicinity / Private Residence, Kukatpally",
+      palette: ["#286548", "#E5AC32", "#FAF7F2", "#1F2921"],
+      elements: ["Fresh Marigold Latkans", "Mango Leaf Door Toran", "Brass Urli Floral Displays", "Ceremonial Stage Garlands"],
+      venue: "Temple Hall / Traditional Courtyard",
     },
   },
   {
-    id: "decor-flower-haldi-canopy",
-    title: "Haldi & Mehendi Yellow Fabric & Floral Canopy",
-    category: "flowers",
-    categoryLabel: "Ceremonial Florals",
-    status: "curated_portfolio_photo",
-    statusLabel: "Featured Staging",
-    badgeLabel: "Haldi & Mehendi Decor",
+    id: "asset-florals-haldi",
+    title: "Haldi Ceremonial Pavilion & Drapery",
+    category: "florals",
+    categoryLabel: "Floral Architecture",
     imagePath: "/portfolio/photo_haldi_ceremony.jpg",
-    provenance: "High-resolution ceremony photography showing Haldi and Mehendi festive floral and fabric setups.",
-    legalNotice: "High-definition traditional ceremony reference photography.",
+    photographer: "Karan Somani",
+    sourceUrl: "https://unsplash.com/photos/80b456fea0bc",
+    license: "Unsplash License (Free commercial & personal use)",
     dimensions: { width: 1600, height: 1067, aspectRatio: "3/2" },
+    caption: "Vibrant yellow ceremonial tent canopy styled with marigold latkans and brass urli bowls",
     description: "Vibrant yellow fabric tent canopy styled with marigold latkans, floral background curtains, brass urlis with flower petals, and festive wooden ceremonial seating.",
     spec: {
-      palette: ["#E5AC32", "#2F7A4F", "#FFF8EE"],
-      decorElements: ["Yellow Drapery Tent", "Fresh Marigold Garlands", "Flower-Filled Brass Urlis", "Ceremonial Low Seating"],
-      recommendedVenue: "Terrace / Courtyard / Banquet, Kukatpally",
+      palette: ["#E5AC32", "#286548", "#FAF7F2"],
+      elements: ["Yellow Drapery Tent", "Fresh Marigold Garlands", "Flower-Filled Brass Urlis", "Ceremonial Low Seating"],
+      venue: "Terrace / Courtyard / Banquet Hall",
     },
   },
   {
-    id: "decor-flower-marigold-strings",
-    title: "Traditional Doorway Toran & Urli Arrangements",
-    category: "flowers",
-    categoryLabel: "Fresh Floral Styling",
-    status: "curated_portfolio_photo",
-    statusLabel: "Featured Staging",
-    badgeLabel: "Traditional Florals",
-    imagePath: "/portfolio/photo_flower_marigold.jpg",
-    provenance: "High-resolution floral photography showing fresh marigold strings and temple floral displays.",
-    legalNotice: "High-definition floral decor reference photography.",
-    dimensions: { width: 1200, height: 800, aspectRatio: "3/2" },
-    description: "Traditional doorway toran, stage floral hangings, and brass urli flower displays woven with fresh yellow and orange marigolds.",
+    id: "asset-spatial-arch",
+    title: "Grand Entrance Organic Archway",
+    category: "spatial",
+    categoryLabel: "Spatial Styling",
+    imagePath: "/portfolio/photo_balloon_entrance_arch.jpg",
+    photographer: "Rohan Makhecha",
+    sourceUrl: "https://unsplash.com/photos/4698179dc6ce",
+    license: "Unsplash License (Free commercial & personal use)",
+    dimensions: { width: 1600, height: 1067, aspectRatio: "3/2" },
+    caption: "Asymmetrical organic balloon garland entrance archway in marigold, coral, and pearl tones",
+    description: "Statement party entryway arch constructed with multi-sized organic balloon clusters in golden marigold, coral, and pearl tones, anchored with non-marking weighted bases.",
     spec: {
-      palette: ["#2F7A4F", "#E5AC32", "#FFF8EE"],
-      decorElements: ["Fresh Marigold Latkans", "Mango Leaf Door Toran", "Brass Urli Floral Bowls", "Auspicious Stage Garlands"],
-      recommendedVenue: "Home Entrance / Temple Hall, Kukatpally",
+      palette: ["#C29B68", "#1F2921", "#FAF7F2"],
+      elements: ["High-Density Organic Arch", "Chrome & Matte Color Mixing", "Free-Standing Framework", "Entrance Focal Styling"],
+      venue: "Banquet Foyer / Entrance Portal",
+    },
+  },
+  {
+    id: "asset-spatial-dinner",
+    title: "Evening Canopy Dining & Ambient Drapery",
+    category: "spatial",
+    categoryLabel: "Spatial Styling",
+    imagePath: "/portfolio/photo_dinner_canopy_evening.jpg",
+    photographer: "Sweet Ice Cream Photography",
+    sourceUrl: "https://unsplash.com/photos/4387d4b0b4c6",
+    license: "Unsplash License (Free commercial & personal use)",
+    dimensions: { width: 1800, height: 1200, aspectRatio: "3/2" },
+    caption: "Warm evening canopy dining arrangement with fairy light swags and fine table decor",
+    description: "Atmospheric evening dinner setup featuring suspended gossamer fabric swags, warm fairy lights, floral runner centerpieces, and intimate mood lighting.",
+    spec: {
+      palette: ["#1F2921", "#C29B68", "#FAF7F2"],
+      elements: ["Suspended Fabric Swags", "Micro-Fairy Light Canopy", "Linen Tablescape", "Taper Candle Staging"],
+      venue: "Private Garden / Open-Air Pavilion",
+    },
+  },
+  {
+    id: "asset-spatial-reception",
+    title: "Evening Banquet Stage & Floral Arch",
+    category: "spatial",
+    categoryLabel: "Spatial Styling",
+    imagePath: "/portfolio/photo_reception_stage_evening.jpg",
+    photographer: "Sandy Millar",
+    sourceUrl: "https://unsplash.com/photos/611481863552",
+    license: "Unsplash License (Free commercial & personal use)",
+    dimensions: { width: 1600, height: 1067, aspectRatio: "3/2" },
+    caption: "Evening banquet reception stage featuring pleated fabric backdrop curtains and an illuminated floral archway",
+    description: "Warm ambient reception stage with pleated fabric backdrop, grand floral archway, couple stage sofa, and warm floodlighting.",
+    spec: {
+      palette: ["#1F2921", "#C29B68", "#FAF7F2"],
+      elements: ["Warm Stage Floodlights", "Pleated Velvet Drapery", "Floral Side Pedestals", "Couple Stage Chairs"],
+      venue: "Banquet Hall / Reception Venue",
     },
   },
 ];

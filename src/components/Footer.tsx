@@ -1,119 +1,95 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BUSINESS_CONFIG } from '../data/business';
-import { Star, MapPin, Phone, ArrowUpRight } from 'lucide-react';
+import { A3Y_CONFIG } from '../data/config';
+import { Phone, ArrowUpRight, Code, ShieldCheck } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
     <footer className="site-footer" role="contentinfo">
       <div className="container">
+        {/* Main Footer Grid */}
         <div className="footer-grid">
-          {/* Column 1: Business Identification & Locality */}
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h2 className="footer-brand-title">{BUSINESS_CONFIG.name}</h2>
-              <span className="concept-preview-pill light">
-                {BUSINESS_CONFIG.previewNotice.badgeText}
+          {/* Brand & Concept Identity Column */}
+          <div className="footer-brand-col">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="font-serif font-bold text-2xl tracking-tight text-ink">
+                {A3Y_CONFIG.conceptName}
               </span>
+              <span className="header-demo-pill">{A3Y_CONFIG.conceptBadge}</span>
             </div>
-            <p className="footer-text mb-4">
-              Local event decor studio specializing exclusively in birthday, wedding, balloon, and flower decorations across Kukatpally and neighboring Hyderabad localities.
-            </p>
             
-            <div className="flex items-start gap-2 text-xs opacity-80 mb-2">
-              <MapPin size={16} className="flex-shrink-0 mt-0.5 text-coral" />
-              <span>{BUSINESS_CONFIG.location.fullText}</span>
-            </div>
+            <p className="footer-lead">
+              {A3Y_CONFIG.tagline}
+            </p>
 
-            <div className="flex items-center gap-2 text-xs opacity-80">
-              <Phone size={16} className="flex-shrink-0 text-coral" />
-              <a href={BUSINESS_CONFIG.callHref} className="hover:underline">
-                Direct phone: {BUSINESS_CONFIG.phone}
-              </a>
-            </div>
+            {/* Mandatory Fictional Concept Disclaimer */}
+            <p className="footer-concept-notice">
+              {A3Y_CONFIG.footerNotice}
+            </p>
           </div>
 
-          {/* Column 2: Supported Decoration Scope */}
-          <div>
-            <h3 className="footer-heading">Decoration Themes</h3>
-            <ul className="footer-links">
+          {/* Quick Navigation Links */}
+          <div className="footer-nav-col">
+            <h4 className="footer-col-title">Demonstration Pages</h4>
+            <ul className="footer-nav-list">
               <li>
-                <Link to="/decorations#birthday" className="footer-link">
-                  Birthday Decorations
-                </Link>
+                <Link to="/" className="footer-nav-link">Home (Atmospheres &amp; Accordion)</Link>
               </li>
               <li>
-                <Link to="/decorations#wedding" className="footer-link">
-                  Wedding Decorations
-                </Link>
+                <Link to="/decorations" className="footer-nav-link">Spatial Disciplines &amp; Specs</Link>
               </li>
               <li>
-                <Link to="/decorations#balloons" className="footer-link">
-                  Balloon Decorations
-                </Link>
+                <Link to="/gallery" className="footer-nav-link">Visual Lookbook &amp; Lightbox</Link>
               </li>
               <li>
-                <Link to="/decorations#flowers" className="footer-link">
-                  Flower Decorations
-                </Link>
+                <Link to="/contact" className="footer-nav-link">Interactive Event Planner</Link>
               </li>
               <li>
-                <Link to="/gallery" className="footer-link">
-                  Visual Gallery Plates
-                </Link>
+                <Link to="/about" className="footer-nav-link">Studio Philosophy &amp; Architecture</Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 3: Verified Listing & Google Reviews Card */}
-          <div>
-            <h3 className="footer-heading">Verified Listing</h3>
-            <div className="google-rating-card mb-4">
-              <div className="rating-badge">
-                <Star size={18} fill="#E5AC32" stroke="#E5AC32" />
-                <span>{BUSINESS_CONFIG.reputation.rating} / 5.0</span>
+          {/* Developer Contact & Inquiries */}
+          <div className="footer-contact-col">
+            <h4 className="footer-col-title">Developer Contact</h4>
+            <div className="footer-contact-card">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-600 mb-1">
+                <Code size={14} className="text-leaf" />
+                <span>{A3Y_CONFIG.developer.role}</span>
               </div>
-              <div className="text-xs opacity-85 mb-2">
-                Based on {BUSINESS_CONFIG.reputation.reviewCount} customer reviews
+              <div className="font-serif font-bold text-base text-ink mb-1">
+                {A3Y_CONFIG.developer.name} &bull; {A3Y_CONFIG.creator}
               </div>
-              <div className="rating-label mb-3">
-                {BUSINESS_CONFIG.reputation.label}
-              </div>
+              <p className="text-xs text-neutral-600 mb-3 leading-relaxed">
+                {A3Y_CONFIG.developer.note}
+              </p>
+              
               <a
-                href={BUSINESS_CONFIG.location.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs text-amber-300 font-semibold hover:underline"
+                href={A3Y_CONFIG.developer.callHref}
+                className="footer-phone-btn"
+                aria-label={`${A3Y_CONFIG.developer.label}: call ${A3Y_CONFIG.developer.phone}`}
               >
-                <span>{BUSINESS_CONFIG.reputation.mapsLinkText}</span>
+                <Phone size={14} />
+                <span>Call {A3Y_CONFIG.developer.phone}</span>
                 <ArrowUpRight size={14} />
               </a>
-            </div>
-
-            <div className="text-[11px] opacity-60 leading-relaxed">
-              <strong>Verification Notice:</strong> This website is an unapproved client preview for Colors Events &amp; Entertainment (Kukatpally, Hyderabad). Unverified emails, hours, and unrelated external businesses (including colorsevents.in) are strictly omitted.
+              <span className="text-[11px] text-neutral-500 block mt-1.5">
+                {A3Y_CONFIG.developer.label}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar: Copyright & Checklist Status */}
-        <div className="footer-bottom">
-          <div>
-            &copy; {new Date().getFullYear()} {BUSINESS_CONFIG.name}. Concept preview draft.
+        {/* Bottom Bar */}
+        <div className="footer-bottom-bar">
+          <div className="flex items-center gap-2 text-xs text-neutral-600">
+            <ShieldCheck size={14} className="text-leaf" />
+            <span>Clean Architecture &bull; Accessible Semantic HTML &bull; Zero External Trackers</span>
           </div>
-          <div className="flex items-center gap-4">
-            <Link to="/about" className="hover:underline">About Studio</Link>
-            <span>&bull;</span>
-            <Link to="/contact" className="hover:underline">Planning Process</Link>
-            <span>&bull;</span>
-            <a
-              href={BUSINESS_CONFIG.location.mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline"
-            >
-              Google Maps Location
-            </a>
+
+          <div className="text-xs text-neutral-500">
+            &copy; {new Date().getFullYear()} {A3Y_CONFIG.creator}. All rights reserved. Self-initiated design concept demo.
           </div>
         </div>
       </div>

@@ -18,25 +18,25 @@ const RouteHandler: React.FC = () => {
       window.scrollTo(0, 0);
     }
 
-    // Dynamic document title update
+    // Dynamic document title update for A3Y Celebrations
     switch (location.pathname) {
       case '/':
-        document.title = 'Colors Events & Entertainment | Kukatpally, Hyderabad';
+        document.title = 'A3Y Celebrations | Concept Studio Demo';
         break;
       case '/decorations':
-        document.title = 'Decoration Themes & Scope | Colors Events Kukatpally';
+        document.title = 'Themes & Architectural Scope | A3Y Celebrations';
         break;
       case '/gallery':
-        document.title = 'Visual Portfolio Gallery | Colors Events Kukatpally';
+        document.title = 'Visual Lookbook & Plates | A3Y Celebrations';
         break;
       case '/about':
-        document.title = 'About Studio & Locality | Colors Events Kukatpally';
+        document.title = 'Concept & Engineering Notes | A3Y Celebrations';
         break;
       case '/contact':
-        document.title = 'Plan Your Celebration | Colors Events Kukatpally';
+        document.title = 'Interactive Event Planner & Contact | A3Y Celebrations';
         break;
       default:
-        document.title = 'Colors Events & Entertainment | Kukatpally, Hyderabad';
+        document.title = 'A3Y Celebrations | Event Studio Concept Demo';
     }
   }, [location.pathname, location.hash]);
 
@@ -46,20 +46,26 @@ const RouteHandler: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
+      {/* Accessible Skip Link */}
+      <a href="#main-content" className="skip-to-content">
+        Skip to main content
+      </a>
+
       <RouteHandler />
-      <div className="flex flex-col min-h-screen">
+
+      <div className="app-wrapper">
         <Header />
-        <main id="main-content" className="flex-grow">
+        <div className="app-content-body">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/decorations" element={<DecorationsPage />} />
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            {/* Fallback to home */}
+            {/* Direct fallback to home */}
             <Route path="*" element={<HomePage />} />
           </Routes>
-        </main>
+        </div>
         <Footer />
       </div>
     </BrowserRouter>

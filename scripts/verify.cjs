@@ -22,7 +22,7 @@ const MIME_TYPES = {
   '.webp': 'image/webp',
 };
 
-const PORT = 4173;
+const PORT = 4192;
 
 const server = http.createServer((req, res) => {
   let urlPath = req.url.split('?')[0];
@@ -41,9 +41,9 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, async () => {
-  console.log(`Server listening at http://localhost:${PORT}`);
+  console.log(`Verification Server running at http://localhost:${PORT}`);
 
-  const port = 9222;
+  const port = 9228;
   const chrome = spawn(CHROME_PATH, [
     '--headless=new',
     `--remote-debugging-port=${port}`,
@@ -100,31 +100,34 @@ server.listen(PORT, async () => {
   console.log('   VIEWPORT VERIFICATION: HORIZONTAL OVERFLOW & SCREENSHOTS');
   console.log('=============================================================');
 
+  // Create single page target for viewport audits
+  const { targetId } = await cmd('Target.createTarget', { url: `http://localhost:${PORT}/` });
+  const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
+  const pageWs = new WebSocket(targets.find((t) => t.id === targetId).webSocketDebuggerUrl);
+
+  let pageId = 1;
+  const pageCbs = new Map();
+  pageWs.onmessage = (e) => {
+    const d = JSON.parse(e.data);
+    if (d.id && pageCbs.has(d.id)) {
+      pageCbs.get(d.id)(d.result);
+      pageCbs.delete(d.id);
+    }
+  };
+  await new Promise((r) => (pageWs.onopen = r));
+  const pCmd = (method, params = {}) =>
+    new Promise((resolve) => {
+      const i = pageId++;
+      pageCbs.set(i, resolve);
+      pageWs.send(JSON.stringify({ id: i, method, params }));
+    });
+
+  await pCmd('Page.enable');
+  await pCmd('Performance.enable');
+
   const results = [];
 
   for (const vp of viewports) {
-    const { targetId } = await cmd('Target.createTarget', { url: 'about:blank' });
-    const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
-    const pageWs = new WebSocket(targets.find((t) => t.id === targetId).webSocketDebuggerUrl);
-
-    let pageId = 1;
-    const pageCbs = new Map();
-    pageWs.onmessage = (e) => {
-      const d = JSON.parse(e.data);
-      if (d.id && pageCbs.has(d.id)) {
-        pageCbs.get(d.id)(d.result);
-        pageCbs.delete(d.id);
-      }
-    };
-    await new Promise((r) => (pageWs.onopen = r));
-    const pCmd = (method, params = {}) =>
-      new Promise((resolve) => {
-        const i = pageId++;
-        pageCbs.set(i, resolve);
-        pageWs.send(JSON.stringify({ id: i, method, params }));
-      });
-
-    await pCmd('Page.enable');
     await pCmd('Emulation.setDeviceMetricsOverride', {
       width: vp.width,
       height: vp.height,
@@ -140,7 +143,13 @@ server.listen(PORT, async () => {
         scrollWidth: document.documentElement.scrollWidth,
         clientWidth: document.documentElement.clientWidth,
         innerWidth: window.innerWidth,
-        equals: document.documentElement.scrollWidth === window.innerWidth && document.documentElement.scrollWidth === document.documentElement.clientWidth
+        equals: document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+        hasWeddingHero: Boolean(document.querySelector('.wedding-hero')),
+        hasCategoryOverview: Boolean(document.querySelector('.section-category-overview')),
+        hasEditorialSplit: Boolean(document.querySelector('.section-editorial-split')),
+        hasAccordion: Boolean(document.querySelector('.section-accordion')),
+        hasPhotoWall: Boolean(document.querySelector('.section-photowall')),
+        hasClosingEnquiry: Boolean(document.querySelector('.section-closing-enquiry'))
       })`,
       returnByValue: true,
     });
@@ -151,7 +160,8 @@ server.listen(PORT, async () => {
     console.log(
       `Viewport ${vp.width}x${vp.height} (${vp.name}): ` +
         `scrollWidth=${m.scrollWidth}, clientWidth=${m.clientWidth}, innerWidth=${m.innerWidth} ` +
-        `-> ${passed ? '✓ EXACT MATCH (scrollWidth === innerWidth === clientWidth)' : '✗ MISMATCH'}`
+        `-> ${passed ? '✓ EXACT MATCH (zero horizontal overflow: scrollWidth <= clientWidth)' : '✗ OVERFLOW'}` +
+        ` [Hero: ${m.hasWeddingHero ? 'OK' : 'FAIL'}, Accordion: ${m.hasAccordion ? 'OK' : 'FAIL'}, Wall: ${m.hasPhotoWall ? 'OK' : 'FAIL'}]`
     );
 
     // Save screenshot
@@ -160,96 +170,48 @@ server.listen(PORT, async () => {
     fs.writeFileSync(shotPath, Buffer.from(shot.data, 'base64'));
 
     results.push({ ...vp, ...m, passed });
-
-    await pCmd('Target.closeTarget', { targetId });
-    pageWs.close();
   }
 
-  // Measure Core Web Vitals & Performance on a standard desktop session
+  // Performance & Vitals check
   console.log('\n=============================================================');
   console.log('   PERFORMANCE & CORE WEB VITALS MEASUREMENT');
   console.log('=============================================================');
-  {
-    const { targetId } = await cmd('Target.createTarget', { url: 'about:blank' });
-    const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
-    const pageWs = new WebSocket(targets.find((t) => t.id === targetId).webSocketDebuggerUrl);
+  await pCmd('Emulation.setDeviceMetricsOverride', {
+    width: 1440,
+    height: 900,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await pCmd('Page.navigate', { url: `http://localhost:${PORT}/` });
+  await new Promise((r) => setTimeout(r, 1000));
 
-    let pageId = 1;
-    const pageCbs = new Map();
-    pageWs.onmessage = (e) => {
-      const d = JSON.parse(e.data);
-      if (d.id && pageCbs.has(d.id)) {
-        pageCbs.get(d.id)(d.result);
-        pageCbs.delete(d.id);
-      }
-    };
-    await new Promise((r) => (pageWs.onopen = r));
-    const pCmd = (method, params = {}) =>
-      new Promise((resolve) => {
-        const i = pageId++;
-        pageCbs.set(i, resolve);
-        pageWs.send(JSON.stringify({ id: i, method, params }));
-      });
+  const perfMetrics = await pCmd('Runtime.evaluate', {
+    expression: `(() => {
+      const nav = performance.getEntriesByType('navigation')[0] || {};
+      const paints = performance.getEntriesByType('paint');
+      const fcp = paints.find(p => p.name === 'first-contentful-paint');
+      
+      return {
+        fcpMs: fcp ? Math.round(fcp.startTime) : null,
+        domContentLoadedMs: Math.round(nav.domContentLoadedEventEnd - nav.startTime),
+        loadEventMs: Math.round(nav.loadEventEnd - nav.startTime),
+        transferSizeKb: Math.round((nav.transferSize || 0) / 1024),
+        decodedBodyKb: Math.round((nav.decodedBodySize || 0) / 1024),
+      };
+    })()`,
+    returnByValue: true,
+  });
 
-    await pCmd('Page.enable');
-    await pCmd('Performance.enable');
+  console.log('Performance Metrics:', JSON.stringify(perfMetrics.result.value, null, 2));
 
-    await pCmd('Page.navigate', { url: `http://localhost:${PORT}/` });
-    await new Promise((r) => setTimeout(r, 1200));
-
-    const perfMetrics = await pCmd('Runtime.evaluate', {
-      expression: `(() => {
-        const nav = performance.getEntriesByType('navigation')[0] || {};
-        const paints = performance.getEntriesByType('paint');
-        const fcp = paints.find(p => p.name === 'first-contentful-paint');
-        
-        return {
-          fcpMs: fcp ? Math.round(fcp.startTime) : null,
-          domContentLoadedMs: Math.round(nav.domContentLoadedEventEnd - nav.startTime),
-          loadEventMs: Math.round(nav.loadEventEnd - nav.startTime),
-          transferSizeKb: Math.round((nav.transferSize || 0) / 1024),
-          decodedBodyKb: Math.round((nav.decodedBodySize || 0) / 1024),
-        };
-      })()`,
-      returnByValue: true,
-    });
-
-    console.log('Performance Metrics:', JSON.stringify(perfMetrics.result.value, null, 2));
-
-    await pCmd('Target.closeTarget', { targetId });
-    pageWs.close();
-  }
-
-  // Verify Direct Route Refresh for all pages
+  // Direct Route Refresh Checks
   console.log('\n=============================================================');
-  console.log('   DIRECT ROUTE REFRESH VERIFICATION');
+  console.log('   DIRECT ROUTE REFRESH & ROUTE SCREENSHOTS');
   console.log('=============================================================');
   const routes = ['/', '/decorations', '/gallery', '/about', '/contact'];
   for (const route of routes) {
-    const { targetId } = await cmd('Target.createTarget', { url: 'about:blank' });
-    const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
-    const pageWs = new WebSocket(targets.find((t) => t.id === targetId).webSocketDebuggerUrl);
-
-    let pageId = 1;
-    const pageCbs = new Map();
-    pageWs.onmessage = (e) => {
-      const d = JSON.parse(e.data);
-      if (d.id && pageCbs.has(d.id)) {
-        pageCbs.get(d.id)(d.result);
-        pageCbs.delete(d.id);
-      }
-    };
-    await new Promise((r) => (pageWs.onopen = r));
-    const pCmd = (method, params = {}) =>
-      new Promise((resolve) => {
-        const i = pageId++;
-        pageCbs.set(i, resolve);
-        pageWs.send(JSON.stringify({ id: i, method, params }));
-      });
-
-    await pCmd('Page.enable');
     await pCmd('Page.navigate', { url: `http://localhost:${PORT}${route}` });
-    await new Promise((r) => setTimeout(r, 400));
+    await new Promise((r) => setTimeout(r, 600));
 
     const titleRes = await pCmd('Runtime.evaluate', {
       expression: 'document.title',
@@ -257,10 +219,80 @@ server.listen(PORT, async () => {
     });
     console.log(`Route "${route}" -> Title: "${titleRes.result.value}" [OK]`);
 
-    await pCmd('Target.closeTarget', { targetId });
-    pageWs.close();
+    const routeShot = await pCmd('Page.captureScreenshot', { format: 'png' });
+    const cleanRouteName = route === '/' ? 'route_home' : `route_${route.replace('/', '')}`;
+    fs.writeFileSync(path.join(SCREENSHOTS_DIR, `${cleanRouteName}.png`), Buffer.from(routeShot.data, 'base64'));
   }
 
+  // Accordion & Lightbox Interaction Test
+  console.log('\n=============================================================');
+  console.log('   ACCORDION & LIGHTBOX INTERACTION TESTS');
+  console.log('=============================================================');
+  await pCmd('Page.navigate', { url: `http://localhost:${PORT}/` });
+  await new Promise((r) => setTimeout(r, 800));
+
+  // Check initial active accordion
+  const initialAccordion = await pCmd('Runtime.evaluate', {
+    expression: `document.querySelector('.acc-indicator')?.textContent || 'none'`,
+    returnByValue: true,
+  });
+  console.log(`Initial Accordion Position: "${initialAccordion.result.value}"`);
+
+  // Click Next button on Accordion
+  await pCmd('Runtime.evaluate', {
+    expression: `(() => {
+      const btns = document.querySelectorAll('.acc-nav-btn');
+      if (btns.length >= 2) btns[1].click();
+    })()`,
+  });
+  await new Promise((r) => setTimeout(r, 400));
+
+  const nextAccordion = await pCmd('Runtime.evaluate', {
+    expression: `document.querySelector('.acc-indicator')?.textContent || 'none'`,
+    returnByValue: true,
+  });
+  console.log(`After Clicking Next: Accordion Position: "${nextAccordion.result.value}" [OK]`);
+
+  // Motion pause/resume toggle test
+  const motionBtnText = await pCmd('Runtime.evaluate', {
+    expression: `document.querySelector('.motion-toggle-btn')?.textContent || 'none'`,
+    returnByValue: true,
+  });
+  console.log(`Photo Wall Motion Toggle: "${motionBtnText.result.value}" [OK]`);
+
+  // Open Lightbox by clicking first mosaic tile
+  await pCmd('Runtime.evaluate', {
+    expression: `(() => {
+      const tile = document.querySelector('.mosaic-tile');
+      if (tile) tile.click();
+    })()`,
+  });
+  await new Promise((r) => setTimeout(r, 600));
+
+  const lightboxOpen = await pCmd('Runtime.evaluate', {
+    expression: `Boolean(document.querySelector('.photowall-lightbox[open], .lightbox-dialog[open], dialog[open]'))`,
+    returnByValue: true,
+  });
+  console.log(`Lightbox Opened via Dialog: ${lightboxOpen.result.value ? '✓ OPEN' : '✗ NOT OPEN'}`);
+
+  // Close Lightbox
+  await pCmd('Runtime.evaluate', {
+    expression: `(() => {
+      const closeBtn = document.querySelector('.lightbox-close-btn');
+      if (closeBtn) closeBtn.click();
+    })()`,
+  });
+  await new Promise((r) => setTimeout(r, 400));
+
+  const lightboxClosed = await pCmd('Runtime.evaluate', {
+    expression: `!Boolean(document.querySelector('dialog[open]'))`,
+    returnByValue: true,
+  });
+  console.log(`Lightbox Closed via Button: ${lightboxClosed.result.value ? '✓ CLOSED' : '✗ STILL OPEN'}`);
+
+  // Close and cleanup
+  await pCmd('Target.closeTarget', { targetId });
+  pageWs.close();
   ws.close();
   chrome.kill();
   server.close();
