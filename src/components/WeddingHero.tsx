@@ -50,15 +50,22 @@ export const WeddingHero: React.FC = () => {
           {/* Complete Landscape Photograph in Normal Flow */}
           <div className="wedding-hero-media">
             <div className="wedding-hero-img-frame">
-              <img
-                src="/portfolio/photo_hero_ceremony_venue.jpg"
-                alt="Outdoor garden wedding ceremony canopy with flowing white drapery and botanical arrangements on lawn"
-                className="wedding-hero-img"
-                loading="eager"
-                decoding="async"
-                width={1600}
-                height={985}
-              />
+              <picture>
+                <source
+                  type="image/webp"
+                  srcSet="/portfolio/photo_hero_ceremony_venue-320w.webp 320w, /portfolio/photo_hero_ceremony_venue-480w.webp 480w, /portfolio/photo_hero_ceremony_venue-768w.webp 768w, /portfolio/photo_hero_ceremony_venue-1200w.webp 1200w"
+                  sizes="(max-width: 480px) 100vw, (max-width: 900px) 95vw, 680px"
+                />
+                <img
+                  src="/portfolio/photo_hero_ceremony_venue.jpg"
+                  alt="Outdoor garden wedding ceremony canopy with flowing white drapery and botanical arrangements on lawn"
+                  className="wedding-hero-img"
+                  loading="eager"
+                  decoding="async"
+                  width={1600}
+                  height={1005}
+                />
+              </picture>
             </div>
 
             {/* Caption placed cleanly below image */}

@@ -1393,19 +1393,19 @@ button {
   text-align: center;
 }
 
-/* Desktop Accordion Strip (>= 860px) */
-.desktop-accordion-strip {
-  display: none;
+.accordion-footer-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(28px, 4vw, 44px);
 }
 
-@media (min-width: 860px) {
-  .desktop-accordion-strip {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    min-height: 560px;
-  }
+/* Desktop Accordion Strip (>= 900px fine pointer) */
+.desktop-accordion-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 560px;
 }
 
 .accordion-panel {
@@ -1598,54 +1598,7 @@ button {
   color: rgba(250, 247, 242, 0.5);
 }
 
-/* Mobile Accordion Strip (< 860px) */
-.mobile-accordion-scroller {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 16px;
-  margin-left: calc(clamp(16px, 4vw, 44px) * -1);
-  margin-right: calc(clamp(16px, 4vw, 44px) * -1);
-  padding-left: clamp(16px, 4vw, 44px);
-  padding-right: clamp(16px, 4vw, 44px);
-}
 
-@media (min-width: 860px) {
-  .mobile-accordion-scroller {
-    display: none;
-  }
-}
-
-.mobile-accordion-card {
-  flex: 0 0 calc(84vw - 20px);
-  max-width: 380px;
-  height: 480px;
-  border-radius: var(--radius);
-  overflow: hidden;
-  position: relative;
-  scroll-snap-align: start;
-  background-color: var(--color-forest-dark);
-  box-shadow: 0 8px 24px rgba(24, 29, 25, 0.1);
-}
-
-.mobile-acc-content {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 24px 20px;
-  z-index: 2;
-  color: var(--color-ivory);
-  background: linear-gradient(
-    0deg,
-    rgba(15, 22, 17, 0.95) 0%,
-    rgba(15, 22, 17, 0.55) 50%,
-    transparent 100%
-  );
-}
 
 /* ==========================================================================
    6. IMMERSIVE PHOTO WALL (Asymmetrical Mosaic & Scrim Card)
@@ -3475,7 +3428,7 @@ button {
 }
 
 /* ==========================================================================
-   Sticky Stage Container
+   Sticky Stage Container & Responsive Layout
    ========================================================================== */
 .sticky-stage-container {
   position: -webkit-sticky;
@@ -3490,20 +3443,88 @@ button {
   padding-bottom: 20px;
 }
 
-@media (max-width: 860px) {
+/* Compact Story Mode: Applies to narrow viewports OR coarse pointer/touch devices */
+@media (max-width: 899px), (hover: none), (pointer: coarse) {
   .sticky-stage-container {
     top: 64px;
     gap: 8px;
     max-height: calc(100vh - 68px);
     padding-bottom: 8px;
     align-content: start;
+    grid-template-columns: 1fr !important;
+  }
+
+  .stage-narrative-col {
+    gap: 6px;
+  }
+
+  .stage-chapter-track {
+    display: none !important;
+  }
+
+  .compact-active-chapter-card {
+    display: block;
+    padding: 10px 14px;
+    background-color: var(--color-ivory-surface);
+    border: 1px solid var(--border-card);
+    border-left: 4px solid var(--color-gold);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(24, 29, 25, 0.05);
+    transition: border-color 0.2s ease;
+  }
+
+  .compact-chap-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .compact-chap-badge {
+    font-family: var(--font-serif);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+
+  .compact-chap-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-muted);
+  }
+
+  .compact-chap-headline {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--color-ink);
+    margin-bottom: 3px;
+  }
+
+  .compact-chap-desc {
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--color-ink-subtle);
+    margin: 0;
   }
 }
 
-@media (min-width: 860px) {
+/* Wide Desktop with Fine Pointer */
+@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
   .sticky-stage-container {
     grid-template-columns: 1.25fr 0.85fr;
     gap: 36px;
+  }
+
+  .compact-active-chapter-card {
+    display: none !important;
+  }
+
+  .stage-chapter-track {
+    display: flex !important;
   }
 }
 
