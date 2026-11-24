@@ -1,78 +1,75 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowDown, Sparkles, ArrowUpRight } from 'lucide-react';
+import { Sparkles, ArrowUpRight, ArrowDown } from 'lucide-react';
 import { A3Y_CONFIG } from '../data/config';
 
 export const WeddingHero: React.FC = () => {
-  const scrollToAccordion = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const target = document.getElementById('accordion-section');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
-    <section className="wedding-hero" aria-label="Scenic Wedding Editorial Hero">
-      {/* Background Scenic Wedding Ceremony Photo with Calm Warm Dark Tint */}
-      <div className="wedding-hero-bg-frame" aria-hidden="true">
-        <img
-          src="/portfolio/photo_scenic_aisle_ceremony.jpg"
-          alt=""
-          className="wedding-hero-bg-img"
-          loading="eager"
-          decoding="async"
-        />
-        <div className="wedding-hero-scrim" />
-      </div>
+    <section className="wedding-hero-section" aria-label="A3Y Celebrations Concept Introduction">
+      <div className="container">
+        <div className="wedding-hero-grid">
+          {/* Text Content */}
+          <div className="wedding-hero-copy">
+            <div className="wedding-hero-meta">
+              <span className="hero-concept-tag">
+                <Sparkles size={13} className="hero-tag-icon" />
+                <span>{A3Y_CONFIG.conceptBadge}</span>
+              </span>
+              <span className="hero-season-tag">Design Demonstration</span>
+            </div>
 
-      <div className="container wedding-hero-inner">
-        {/* Editorial Sub-label */}
-        <div className="wedding-hero-meta">
-          <span className="hero-concept-tag">
-            <Sparkles size={13} className="hero-tag-icon" />
-            <span>{A3Y_CONFIG.conceptBadge}</span>
-          </span>
-          <span className="hero-season-tag">2026 Celebration Portfolio</span>
-        </div>
+            <h1 className="wedding-hero-title">
+              Atmospheres for Meaningful Ceremonies
+            </h1>
 
-        {/* Original Short Editorial Heading */}
-        <h1 className="wedding-hero-title">
-          Timeless atmospheres for unforgettable ceremonies.
-        </h1>
+            <p className="wedding-hero-lead">
+              An editorial portfolio demonstration by A3Y Solutions exploring celebration styling, decoration disciplines, and digital craft.
+            </p>
 
-        {/* Refined Subtitle */}
-        <p className="wedding-hero-sub">
-          Bespoke ceremonial mandaps, sculptural floral architecture, and intimate milestone staging conceived with unhurried poise.
-        </p>
+            <div className="wedding-hero-actions">
+              <Link
+                to="/decorations"
+                className="btn-primary"
+                aria-label="Explore our four celebration themes and specifications"
+              >
+                <span>Explore Themes</span>
+                <ArrowDown size={14} />
+              </Link>
 
-        {/* Clear Action Calls */}
-        <div className="wedding-hero-actions">
-          <a
-            href="#accordion-section"
-            onClick={scrollToAccordion}
-            className="hero-btn-primary"
-            aria-label="Scroll down to explore the ceremonial atmospheres collection"
-          >
-            <span>Explore the Collection</span>
-            <ArrowDown size={15} />
-          </a>
+              <Link
+                to="/contact"
+                className="btn-secondary"
+                aria-label="Contact A3Y about a web project or website design"
+              >
+                <span>Contact A3Y</span>
+                <ArrowUpRight size={14} />
+              </Link>
+            </div>
+          </div>
 
-          <Link
-            to="/contact"
-            className="hero-btn-secondary"
-            aria-label="Open interactive event planner and view contact options"
-          >
-            <span>Plan a Celebration</span>
-            <ArrowUpRight size={15} />
-          </Link>
-        </div>
+          {/* Complete Landscape Photograph in Normal Flow */}
+          <div className="wedding-hero-media">
+            <div className="wedding-hero-img-frame">
+              <img
+                src="/portfolio/photo_hero_ceremony_venue.jpg"
+                alt="Outdoor garden wedding ceremony canopy with flowing white drapery and botanical arrangements on lawn"
+                className="wedding-hero-img"
+                loading="eager"
+                decoding="async"
+                width={1600}
+                height={985}
+              />
+            </div>
 
-        {/* Honest Image Caption & Photographer Credit */}
-        <div className="wedding-hero-caption" aria-label="Hero photograph context">
-          <span>Plate: Open-air ceremony aisle &amp; floral staging &bull; Curated for demo inspiration via Unsplash (Photo by Sandy Millar)</span>
+            {/* Caption placed cleanly below image */}
+            <p className="wedding-hero-caption">
+              Outdoor garden ceremony canopy with flowing white drapery and botanical arrangements &bull; Photo by Matthew (Unsplash)
+            </p>
+          </div>
         </div>
       </div>
     </section>
   );
 };
+
+export default WeddingHero;

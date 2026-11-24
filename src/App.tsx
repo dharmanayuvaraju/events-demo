@@ -7,6 +7,7 @@ import { DecorationsPage } from './pages/DecorationsPage';
 import { GalleryPage } from './pages/GalleryPage';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
+import { StoryPage } from './pages/StoryPage';
 
 // Scroll to top and set document title on navigation
 const RouteHandler: React.FC = () => {
@@ -23,8 +24,11 @@ const RouteHandler: React.FC = () => {
       case '/':
         document.title = 'A3Y Celebrations | Concept Studio Demo';
         break;
+      case '/story':
+        document.title = 'Concept Story & Transformation | A3Y Celebrations';
+        break;
       case '/decorations':
-        document.title = 'Themes & Architectural Scope | A3Y Celebrations';
+        document.title = 'Themes & Scope | A3Y Celebrations';
         break;
       case '/gallery':
         document.title = 'Visual Lookbook & Plates | A3Y Celebrations';
@@ -58,6 +62,7 @@ export const App: React.FC = () => {
         <div className="app-content-body">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/story" element={<StoryPage />} />
             <Route path="/decorations" element={<DecorationsPage />} />
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/about" element={<AboutPage />} />

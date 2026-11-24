@@ -61,13 +61,14 @@ const STORY_CHAPTERS: StoryChapter[] = [
 ];
 
 export const ScrollTransformation: React.FC = () => {
-  // Check user environment preferences (reduced motion or save-data)
+  // Check user environment preferences (reduced motion, save-data, or short viewport)
   const [mode, setMode] = useState<'animation' | 'static'>(() => {
     if (typeof window !== 'undefined') {
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const nav = navigator as unknown as { connection?: { saveData?: boolean } };
       const saveData = nav.connection?.saveData === true;
-      if (prefersReduced || saveData) return 'static';
+      const isShortViewport = window.innerHeight < 520;
+      if (prefersReduced || saveData || isShortViewport) return 'static';
     }
     return 'animation';
   });
@@ -216,8 +217,8 @@ export const ScrollTransformation: React.FC = () => {
     if (!track || !sticky) return;
 
     const rect = track.getBoundingClientRect();
-    const headerOffset = 76; // Height clearance for sticky navigation
-    const stickyHeight = sticky.offsetHeight || 500;
+    const headerOffset = window.innerWidth < 768 ? 64 : 76; // Height clearance for sticky navigation
+    const stickyHeight = sticky.offsetHeight || 420;
     const totalTravel = rect.height - stickyHeight;
 
     if (totalTravel <= 0) return;
@@ -281,7 +282,7 @@ export const ScrollTransformation: React.FC = () => {
 
   const scrollToNextSection = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const target = document.getElementById('accordion-section');
+    const target = document.getElementById('enquiry-section') || document.getElementById('accordion-section');
     if (target) {
       target.scrollIntoView({ behavior: 'smooth' });
     }

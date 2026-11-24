@@ -1,38 +1,34 @@
 import React from 'react';
+import { IntroOverlay } from '../components/IntroOverlay';
 import { WeddingHero } from '../components/WeddingHero';
-import { CategoryOverview } from '../components/CategoryOverview';
-import { EditorialSplit } from '../components/EditorialSplit';
+import { ThemeTapAccordion } from '../components/ThemeTapAccordion';
+import { HomeFeaturedPhotos } from '../components/HomeFeaturedPhotos';
 import { ScrollTransformation } from '../components/ScrollTransformation';
-import { PhotoAccordion } from '../components/PhotoAccordion';
-import { PhotoWall } from '../components/PhotoWall';
 import { ClosingEnquiry } from '../components/ClosingEnquiry';
 
 export const HomePage: React.FC = () => {
   return (
-    <main id="main-content">
-      {/* 1. Large Scenic Wedding-Photo Hero with Original Short Heading & Clear CTA */}
-      <WeddingHero />
+    <>
+      {/* 4-Second Grand-Entry Intro Overlay (Plays on Fresh Visit / Page Refresh) */}
+      <IntroOverlay />
 
-      {/* 2. Warm Ivory Event-Category Overview (4 Disciplines) */}
-      <CategoryOverview />
+      <main id="main-content" className="home-main">
+        {/* 1. Compact Hero with Real Wide Venue Photo & Actions */}
+        <WeddingHero />
 
-      {/* 3. Editorial Split Image & Text Section with Studio Philosophy */}
-      <EditorialSplit />
+        {/* 2. Four Collapsed Tap-to-Expand Theme Rows */}
+        <ThemeTapAccordion />
 
-      {/* 4. Scroll-Controlled Wedding Transformation (Bounded Scrollytelling & Accessible Static Mode) */}
-      <ScrollTransformation />
+        {/* 3. Three Full-Image Landscape Concept Plates */}
+        <HomeFeaturedPhotos />
 
-      {/* 5. Expanding Photo Accordion (7 Panels, Desktop Staggered Heights & Mobile Strip) */}
-      <div id="accordion-section">
-        <PhotoAccordion />
-      </div>
+        {/* 4. Full Scroll-Controlled Transformation Story */}
+        <ScrollTransformation />
 
-      {/* 6. Immersive Photo-Wall Gallery (Asymmetrical Mosaic, Scrim Card, Pointer Pan & Lightbox) */}
-      <PhotoWall />
-
-      {/* 7. Green Closing Enquiry Section with Developer Contact */}
-      <ClosingEnquiry />
-    </main>
+        {/* 5. Direct Developer Inquiry CTA */}
+        <ClosingEnquiry />
+      </main>
+    </>
   );
 };
 

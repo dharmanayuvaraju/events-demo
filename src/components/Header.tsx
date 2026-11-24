@@ -64,6 +64,7 @@ export const Header: React.FC = () => {
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/decorations', label: 'Themes' },
+    { to: '/story', label: 'Story' },
     { to: '/gallery', label: 'Gallery' },
     { to: '/contact', label: 'Planner & Contact' },
     { to: '/about', label: 'About' },
@@ -147,7 +148,9 @@ export const Header: React.FC = () => {
         role="dialog"
         aria-modal="true"
         aria-label="Mobile Navigation Menu"
+        aria-hidden={!isDrawerOpen}
         tabIndex={-1}
+        style={{ visibility: isDrawerOpen ? 'visible' : 'hidden' }}
       >
         <div className="drawer-header">
           <div className="flex items-center gap-2">

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ASSETS_MANIFEST, PortfolioAsset } from '../data/assetsManifest';
 import { resolveThemeSectionId, ThemeSectionId } from '../data/themeMapping';
+import { PhotoAccordion } from '../components/PhotoAccordion';
 import { ArrowUpRight, Sparkles, Check, Image as ImageIcon } from 'lucide-react';
 
 interface ThemeSpec {
@@ -114,12 +115,12 @@ export const DecorationsPage: React.FC = () => {
       <div className="container">
         {/* Page Header */}
         <div className="section-header max-w-3xl mb-12">
-          <span className="section-label">Spatial Disciplines &amp; Scope</span>
+          <span className="section-label">Themes &amp; Scope</span>
           <h1 className="section-title">
-            Architectural Celebration Disciplines
+            Celebration Disciplines &amp; Specifications
           </h1>
           <p className="section-lead">
-            A structured breakdown of our four concept celebration disciplines, detailing spatial proportions, material integrity, and structural anchoring methods.
+            Explore our four celebration themes detailing staging dimensions, material palettes, and setup specifications.
           </p>
         </div>
 
@@ -180,35 +181,6 @@ export const DecorationsPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Secondary Visual Variations (Thumbnail Selector) */}
-                    {matchingAssets.length > 1 && (
-                      <div className="theme-variations-box">
-                        <span className="variations-title">Inspiration Variations (Click to preview):</span>
-                        <div className="variations-thumbnails-grid">
-                          {matchingAssets.map((asset) => {
-                            const isCurrent = asset.id === displayedAsset.id;
-                            return (
-                              <button
-                                key={asset.id}
-                                type="button"
-                                className={`variation-thumb-btn ${isCurrent ? 'active-thumb' : ''}`}
-                                onClick={() => setSelectedAssetMap((prev) => ({ ...prev, [spec.id]: asset.id }))}
-                                aria-label={`Preview plate: ${asset.title}`}
-                              >
-                                <img
-                                  src={asset.imagePath}
-                                  alt=""
-                                  className="variation-thumb-img"
-                                  loading="lazy"
-                                />
-                                <span className="variation-thumb-title">{asset.title}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
                     {/* Action Buttons */}
                     <div className="theme-action-row">
                       <Link
@@ -231,38 +203,77 @@ export const DecorationsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Right Column: Full-Bleed Editorial Visual Showcase */}
+                  {/* Right Column: Balanced Editorial Visual Showcase */}
                   <div className="theme-detail-media">
                     <div className="theme-photo-showcase">
-                      <img
-                        key={displayedAsset.id}
-                        src={displayedAsset.imagePath}
-                        alt={displayedAsset.title}
-                        className="theme-showcase-img"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <div className="theme-showcase-scrim" />
-
-                      {/* Top Glassmorphic Category Tag */}
-                      <div className="theme-showcase-tag">
-                        <ImageIcon size={13} />
-                        <span>{displayedAsset.categoryLabel}</span>
+                      <div className="theme-media-header">
+                        <div className="theme-showcase-tag">
+                          <ImageIcon size={13} />
+                          <span>{displayedAsset.categoryLabel}</span>
+                        </div>
+                        <span className="theme-media-badge">Discipline {spec.index}</span>
                       </div>
 
-                      {/* Bottom Caption & Credit Overlay */}
-                      <div className="theme-showcase-footer">
+                      <div className="theme-showcase-frame">
+                        <img
+                          key={displayedAsset.id}
+                          src={displayedAsset.imagePath}
+                          alt={displayedAsset.title}
+                          className="theme-showcase-img"
+                          loading="lazy"
+                          decoding="async"
+                          width={1600}
+                          height={1000}
+                        />
+                      </div>
+
+                      {/* Honest Caption & Credit Directly Below Photo */}
+                      <div className="theme-showcase-meta">
                         <h4 className="showcase-photo-title">{displayedAsset.title}</h4>
                         <p className="showcase-photo-caption">
                           {displayedAsset.caption} &bull; Photo by {displayedAsset.photographer} (Unsplash)
                         </p>
                       </div>
+
+                      {/* Inspiration Variations Selector */}
+                      {matchingAssets.length > 1 && (
+                        <div className="theme-variations-box-media">
+                          <span className="variations-title-media">Inspiration Variations (Click to preview):</span>
+                          <div className="variations-thumbnails-grid">
+                            {matchingAssets.map((asset) => {
+                              const isCurrent = asset.id === displayedAsset.id;
+                              return (
+                                <button
+                                  key={asset.id}
+                                  type="button"
+                                  className={`variation-thumb-btn ${isCurrent ? 'active-thumb' : ''}`}
+                                  onClick={() => setSelectedAssetMap((prev) => ({ ...prev, [spec.id]: asset.id }))}
+                                  aria-label={`Preview plate: ${asset.title}`}
+                                >
+                                  <img
+                                    src={asset.imagePath}
+                                    alt=""
+                                    className="variation-thumb-img"
+                                    loading="lazy"
+                                  />
+                                  <span className="variation-thumb-title">{asset.title}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               </section>
             );
           })}
+        </div>
+
+        {/* 7-Atmosphere Responsive Accordion */}
+        <div className="mt-16 pt-12 border-t border-neutral-200">
+          <PhotoAccordion />
         </div>
       </div>
     </main>

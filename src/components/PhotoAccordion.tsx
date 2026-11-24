@@ -1,89 +1,38 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ACCORDION_ITEMS } from '../data/assetsManifest';
-import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, ArrowUpRight } from 'lucide-react';
 
 export const PhotoAccordion: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const mobileScrollRef = useRef<HTMLDivElement>(null);
-  
-  // Guard against mount-time scroll: never auto-scroll the document or container on initial mount!
-  const isInitialMount = useRef<boolean>(true);
-  // Guard against scroll feedback loop when user manually swipes
-  const isProgrammaticScroll = useRef<boolean>(false);
-  const scrollTimeoutRef = useRef<number | null>(null);
+  const [mobileOpenIndex, setMobileOpenIndex] = useState<number | null>(0);
 
-  // Effective displayed index: hovered on pointer desktop, or active on click/keyboard
+  // Effective displayed index for desktop: hovered on pointer, or active on click/keyboard
   const displayIndex = hoveredIndex !== null ? hoveredIndex : activeIndex;
-
-  // Horizontal container scrolling only - NEVER scrollIntoView or vertical document scroll
-  const scrollContainerToCard = useCallback((index: number) => {
-    const el = mobileScrollRef.current;
-    if (!el || window.innerWidth >= 860) return;
-
-    const cards = el.querySelectorAll<HTMLElement>('.mobile-accordion-card');
-    const targetCard = cards[index];
-    if (targetCard) {
-      isProgrammaticScroll.current = true;
-      const cardLeft = targetCard.offsetLeft - el.offsetLeft;
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      el.scrollTo({
-        left: cardLeft,
-        behavior: prefersReduced ? 'auto' : 'smooth',
-      });
-
-      if (scrollTimeoutRef.current) window.clearTimeout(scrollTimeoutRef.current);
-      scrollTimeoutRef.current = window.setTimeout(() => {
-        isProgrammaticScroll.current = false;
-      }, 400);
-    }
-  }, []);
 
   const goToPrev = () => {
     const newIdx = (activeIndex - 1 + ACCORDION_ITEMS.length) % ACCORDION_ITEMS.length;
     setActiveIndex(newIdx);
     setHoveredIndex(null);
-    scrollContainerToCard(newIdx);
+    setMobileOpenIndex(newIdx);
   };
 
   const goToNext = () => {
     const newIdx = (activeIndex + 1) % ACCORDION_ITEMS.length;
     setActiveIndex(newIdx);
     setHoveredIndex(null);
-    scrollContainerToCard(newIdx);
+    setMobileOpenIndex(newIdx);
   };
 
   const handleSelectPanel = (index: number) => {
     setActiveIndex(index);
     setHoveredIndex(null);
-    scrollContainerToCard(index);
   };
 
-  // Sync mobile horizontal scroll only after initial mount upon intentional state changes
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-  }, []);
-
-  // Listen to mobile horizontal scroll when user swipes cards directly
-  const handleMobileScroll = () => {
-    if (isProgrammaticScroll.current) return;
-    const el = mobileScrollRef.current;
-    if (!el) return;
-
-    const scrollLeft = el.scrollLeft;
-    const firstCard = el.querySelector<HTMLElement>('.mobile-accordion-card');
-    const cardWidth = firstCard ? firstCard.offsetWidth + 16 : 300;
-    const index = Math.round(scrollLeft / cardWidth);
-    const clamped = Math.max(0, Math.min(ACCORDION_ITEMS.length - 1, index));
-
-    if (clamped !== activeIndex) {
-      setActiveIndex(clamped);
-    }
+  const toggleMobileRow = (index: number) => {
+    setMobileOpenIndex((prev) => (prev === index ? null : index));
+    setActiveIndex(index);
   };
 
   return (
@@ -97,7 +46,7 @@ export const PhotoAccordion: React.FC = () => {
               Ceremonial Spaces &amp; Floral Architecture
             </h2>
             <p className="section-lead max-w-2xl">
-              An interactive visual accordion highlighting seven distinct spatial disciplines—from sacred ceremony mandaps to open-air banquet canopies.
+              An interactive visual accordion highlighting seven distinct celebration settings—from sacred ceremony mandaps to open-air banquet canopies.
             </p>
           </div>
 
@@ -115,7 +64,7 @@ export const PhotoAccordion: React.FC = () => {
 
             <div className="acc-counter acc-indicator" aria-live="polite">
               <span className="acc-curr-num">
-                {String(displayIndex + 1).padStart(2, '0')}
+                {String((mobileOpenIndex !== null ? mobileOpenIndex : displayIndex) + 1).padStart(2, '0')}
               </span>
               <span className="acc-divider">/</span>
               <span className="acc-total-num">
@@ -136,7 +85,7 @@ export const PhotoAccordion: React.FC = () => {
         </div>
 
         {/* =================================================================
-            DESKTOP EXPANDING ACCORDION (Visible on screens >= 860px)
+            DESKTOP EXPANDING ACCORDION (Desktop with hover:hover & pointer:fine)
             ================================================================= */}
         <div
           className="desktop-accordion-strip"
@@ -147,9 +96,6 @@ export const PhotoAccordion: React.FC = () => {
           {ACCORDION_ITEMS.map((item, idx) => {
             const isExpanded = idx === displayIndex;
 
-            // When collapsed, the panel functions as an accessible button trigger (with Enter/Space).
-            // When expanded, the panel acts as a container holding the editorial card and action link,
-            // avoiding nested interactive button elements.
             return (
               <div
                 key={item.id}
@@ -216,7 +162,7 @@ export const PhotoAccordion: React.FC = () => {
                           <ArrowUpRight size={14} />
                         </Link>
                         <span className="photographer-credit">
-                          Photo by {item.photographer}
+                          Photo by {item.photographer} (Unsplash)
                         </span>
                       </div>
                     </div>
@@ -228,69 +174,83 @@ export const PhotoAccordion: React.FC = () => {
         </div>
 
         {/* =================================================================
-            MOBILE SWIPEABLE CARD STRIP (Visible on screens < 860px)
+            MOBILE TOUCH VERTICAL ACCORDION (Phones / Touch Devices)
             ================================================================= */}
-        <div
-          ref={mobileScrollRef}
-          className="mobile-accordion-scroller"
-          role="region"
-          aria-label="Swipeable celebration panels"
-          onScroll={handleMobileScroll}
-        >
-          {ACCORDION_ITEMS.map((item, idx) => (
-            <article
-              key={item.id}
-              className={`mobile-accordion-card ${idx === activeIndex ? 'mobile-card-selected' : ''}`}
-              onClick={() => handleSelectPanel(idx)}
-            >
-              <div className="mobile-card-media">
-                <img
-                  src={item.imagePath}
-                  alt={item.title}
-                  className="mobile-card-img"
-                  loading="lazy"
-                />
-                <div className="mobile-card-scrim" />
-                <span className="mobile-card-tag">{item.category}</span>
-              </div>
+        <div className="mobile-tap-accordion-wrap" role="region" aria-label="Touch celebration accordion">
+          {ACCORDION_ITEMS.map((item, idx) => {
+            const isOpen = mobileOpenIndex === idx;
+            const contentId = `mobile-acc-panel-${item.id}`;
+            const headerId = `mobile-acc-header-${item.id}`;
 
-              <div className="mobile-card-body">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-semibold text-olive opacity-75">
-                    Chapter #{item.index}
-                  </span>
-                  <span className="text-xs opacity-60">By {item.photographer}</span>
-                </div>
-                <h3 className="mobile-card-title">{item.title}</h3>
-                <p className="mobile-card-desc">{item.shortDesc}</p>
-
-                <Link
-                  to={item.route}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-olive mt-3 hover:underline"
+            return (
+              <div
+                key={item.id}
+                className={`mobile-acc-card ${isOpen ? 'is-open' : 'is-collapsed'}`}
+              >
+                {/* 44px+ Accessible Tap Button */}
+                <button
+                  id={headerId}
+                  type="button"
+                  className="mobile-acc-header-btn"
+                  onClick={() => toggleMobileRow(idx)}
+                  aria-expanded={isOpen}
+                  aria-controls={contentId}
                 >
-                  <span>Explore specifications</span>
-                  <ArrowUpRight size={13} />
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+                  <span className="mobile-acc-index">{item.index}</span>
+                  <div className="mobile-acc-title-col">
+                    <span className="mobile-acc-title">{item.title}</span>
+                    <span className="mobile-acc-category">{item.category}</span>
+                  </div>
+                  <span className={`mobile-acc-chevron ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true">
+                    <ChevronDown size={18} />
+                  </span>
+                </button>
 
-        {/* Mobile Direct Indicators */}
-        <div className="mobile-dots-bar" role="tablist" aria-label="Mobile panel tabs">
-          {ACCORDION_ITEMS.map((_, idx) => (
-            <button
-              key={idx}
-              type="button"
-              role="tab"
-              aria-selected={idx === activeIndex}
-              aria-label={`Jump to panel ${idx + 1}`}
-              className={`mobile-dot ${idx === activeIndex ? 'active' : ''}`}
-              onClick={() => handleSelectPanel(idx)}
-            />
-          ))}
+                {/* Disclosure Panel */}
+                <div
+                  id={contentId}
+                  role="region"
+                  aria-labelledby={headerId}
+                  className={`mobile-acc-panel ${isOpen ? 'panel-open' : 'panel-closed'}`}
+                >
+                  <div className="mobile-acc-panel-inner">
+                    {/* Full-width image at natural ratio */}
+                    <div className="mobile-acc-image-frame">
+                      <img
+                        src={item.imagePath}
+                        alt={item.title}
+                        className="mobile-acc-img"
+                        loading="lazy"
+                        decoding="async"
+                        width={1200}
+                        height={800}
+                      />
+                    </div>
+
+                    {/* Accurate Caption & Link */}
+                    <div className="mobile-acc-meta">
+                      <p className="mobile-acc-desc">
+                        {item.shortDesc} &bull; <span className="opacity-75">Photo by {item.photographer} (Unsplash)</span>
+                      </p>
+
+                      <Link
+                        to={item.route}
+                        className="mobile-acc-link"
+                        aria-label={`View full specifications for ${item.title}`}
+                      >
+                        <span>Specifications &amp; Palettes</span>
+                        <ArrowUpRight size={14} />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 };
+
+export default PhotoAccordion;
