@@ -23,7 +23,7 @@ export const PhotoWall: React.FC = () => {
   const timeRef = useRef<number>(0);
   const mosaicTrackRef = useRef<HTMLDivElement>(null);
 
-  // Select 9 diverse assets for the mosaic
+  // Select 9 distinct assets for the mosaic
   const mosaicAssets = ASSETS_MANIFEST.slice(0, 9);
 
   // Pointer tracking on desktop
@@ -33,10 +33,10 @@ export const PhotoWall: React.FC = () => {
     const xRatio = (e.clientX - rect.left) / rect.width - 0.5;
     const yRatio = (e.clientY - rect.top) / rect.height - 0.5;
 
-    // Bounded pan: maximum +/- 32px
+    // Bounded pan: maximum +/- 24px
     targetPan.current = {
-      x: xRatio * -32,
-      y: yRatio * -24,
+      x: xRatio * -24,
+      y: yRatio * -18,
     };
   };
 
@@ -61,7 +61,7 @@ export const PhotoWall: React.FC = () => {
       ([entry]) => {
         setIsInViewport(entry.isIntersecting);
       },
-      { threshold: 0.15 }
+      { threshold: 0.1 }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -78,13 +78,13 @@ export const PhotoWall: React.FC = () => {
     }
 
     const animate = () => {
-      timeRef.current += 0.015;
-      const driftX = Math.sin(timeRef.current * 0.7) * 8;
-      const driftY = Math.cos(timeRef.current * 0.5) * 6;
+      timeRef.current += 0.012;
+      const driftX = Math.sin(timeRef.current * 0.6) * 6;
+      const driftY = Math.cos(timeRef.current * 0.45) * 5;
 
       // Lerp pointer pan
-      currentPan.current.x += (targetPan.current.x - currentPan.current.x) * 0.06;
-      currentPan.current.y += (targetPan.current.y - currentPan.current.y) * 0.06;
+      currentPan.current.x += (targetPan.current.x - currentPan.current.x) * 0.05;
+      currentPan.current.y += (targetPan.current.y - currentPan.current.y) * 0.05;
 
       const finalX = (currentPan.current.x + driftX).toFixed(2);
       const finalY = (currentPan.current.y + driftY).toFixed(2);
@@ -135,67 +135,78 @@ export const PhotoWall: React.FC = () => {
       onMouseLeave={handleMouseLeave}
       aria-label="Immersive celebration photo wall"
     >
-      {/* Background Asymmetrical Photo Mosaic */}
-      <div className="photowall-mosaic-viewport">
-        <div ref={mosaicTrackRef} className="photowall-mosaic-track">
-          {mosaicAssets.map((asset, idx) => (
-            <div
-              key={asset.id}
-              className={`mosaic-tile mosaic-tile-${idx + 1}`}
-              onClick={() => openLightbox(idx)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  openLightbox(idx);
-                }
-              }}
-              tabIndex={0}
-              role="button"
-              aria-haspopup="dialog"
-              aria-label={`View ${asset.title} in lightbox`}
-            >
-              <img
-                src={asset.imagePath}
-                alt={asset.title}
-                className="mosaic-img"
-                loading="lazy"
-              />
-              <div className="mosaic-tile-overlay">
-                <Maximize2 size={16} className="text-paper" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <div className="container">
+        {/* Editorial Section Header (Above the Mosaic - completely clear of images!) */}
+        <div className="photowall-header-row">
+          <div className="photowall-header-copy">
+            <span className="section-label photowall-gold-label">Lookbook in Motion</span>
+            <h2 className="photowall-heading">
+              Moments Captured in Space &amp; Bloom
+            </h2>
+            <p className="photowall-sub">
+              An unobstructed visual mosaic of ceremonial mandaps, cascading florals, and ambient banquet canopies.
+            </p>
+          </div>
 
-      {/* Centered Editorial Title on a Restrained Scrim */}
-      <div className="photowall-scrim-center scrim-card-overlay">
-        <div className="scrim-card">
-          <span className="section-label">Lookbook In Motion</span>
-          <h2 className="scrim-title">
-            Moments Captured in Space &amp; Bloom
-          </h2>
-          <p className="scrim-desc">
-            An original editorial mosaic of ceremonial mandaps, cascading florals, and ambient banquet drapery.
-          </p>
-
-          <div className="scrim-footer-row">
-            <span className="scrim-meta-tag">
-              <Sparkles size={13} className="text-amber-600" />
+          <div className="photowall-controls-bar">
+            <span className="photowall-plates-badge">
+              <Sparkles size={14} className="text-gold" />
               <span>9 Curated Demonstration Plates</span>
             </span>
 
             {/* Motion Pause Toggle */}
             <button
               type="button"
-              className="btn-motion-toggle motion-toggle-btn"
+              className="motion-toggle-btn"
               onClick={() => setIsMotionActive((prev) => !prev)}
               aria-pressed={isMotionActive}
               aria-label={isMotionActive ? 'Pause photo wall motion' : 'Resume photo wall motion'}
             >
-              {isMotionActive ? <Pause size={12} /> : <Play size={12} />}
+              {isMotionActive ? <Pause size={13} /> : <Play size={13} />}
               <span>Motion: {isMotionActive ? 'On' : 'Off'}</span>
             </button>
+          </div>
+        </div>
+
+        {/* Completely Unobstructed Photo Mosaic Grid */}
+        <div className="photowall-mosaic-viewport">
+          <div ref={mosaicTrackRef} className="photowall-mosaic-track">
+            {mosaicAssets.map((asset, idx) => (
+              <div
+                key={asset.id}
+                className={`mosaic-tile mosaic-tile-${idx + 1}`}
+                onClick={() => openLightbox(idx)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openLightbox(idx);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-haspopup="dialog"
+                aria-label={`View ${asset.title} in lookbook lightbox`}
+              >
+                <img
+                  src={asset.imagePath}
+                  alt={asset.title}
+                  className="mosaic-img"
+                  loading="lazy"
+                  decoding="async"
+                />
+                
+                {/* Clean Hover Overlay with Title & Maximize Icon */}
+                <div className="mosaic-tile-overlay">
+                  <span className="mosaic-category-pill">{asset.categoryLabel}</span>
+                  <div className="mosaic-tile-bottom-meta">
+                    <span className="mosaic-tile-title">{asset.title}</span>
+                    <span className="mosaic-tile-icon-box">
+                      <Maximize2 size={14} />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -213,3 +224,5 @@ export const PhotoWall: React.FC = () => {
     </section>
   );
 };
+
+export default PhotoWall;
